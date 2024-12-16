@@ -1,0 +1,20 @@
+@include 'partial/header.html'
+
+<h1>@{user.get_name()} (@@@user.username)</h1>
+@if ctx.is_logged_in() && user.username == self.username
+<p>this is you!</p>
+@end
+<div>
+	<h2>posts:</h2>
+	@for post in user.posts
+	@include 'components/post.html'
+	@end
+</div>
+<div>
+	<h2>user info:</h2>
+	<p>id: @user.id</p>
+	<p>username: @user.username</p>
+	<p>display name: @user.get_name()</p>
+</div>
+
+@include 'partial/footer.html'

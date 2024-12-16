@@ -1,0 +1,27 @@
+@include 'partial/header.html'
+
+@if !app.config.dev_mode && !ctx.is_logged_in()
+<p>error: not logged in</p>
+@else if !app.config.dev_mode && !user.admin
+<p>error: you are not an admin!</p>
+@else
+
+<h1>admin dashboard</h1>
+<p>logged in as: @user</p>
+<div>
+	<h2>user list:</h2>
+	<div>
+		@for u in app.get_users()
+		<div>
+			<a href="/user/@u.id">@u.get_name() (@@@u.username) [@u.id]</a>
+			<p>muted=@u.muted, admin=@u.admin</p>
+			<p>created_at=@u.created_at</p>
+		</div>
+		<hr>
+		@end
+	</div>
+</div>
+
+@end
+
+@include 'partial/footer.html'

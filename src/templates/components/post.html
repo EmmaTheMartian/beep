@@ -1,0 +1,5 @@
+<div>
+	<p><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</p>
+	<p>@post.body</p>
+	<p>posted at: @post.posted_at</p>
+</div>

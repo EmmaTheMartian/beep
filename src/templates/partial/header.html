@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="description" content="" />
+	<link rel="icon" href="/favicon.png" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>@ctx.title</title>
+	@include 'assets/style.html'
+</head>
+
+<body>
+
+	<header>
+		<a href="/">home</a>
+		-
+
+		@if app.config.dev_mode
+		<a href="/admin">admin</a>
+		-
+		@end
+
+		@if ctx.is_logged_in()
+		<a href="/me">profile</a>
+		-
+		<a href="/api/full_logout">log out</a>
+		@else
+		<a href="/login">log in</a>
+		<span>or</span>
+		<a href="/register">sign up</a>
+		@end
+		<hr>
+	</header>
+
+	<main>
+		@if ctx.form_error != ''
+		<div>
+			<p><strong>error:</strong> ctx.form_error</p>
+		</div>
+		@end

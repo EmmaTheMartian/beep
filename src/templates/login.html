@@ -1,0 +1,26 @@
+@include 'partial/header.html'
+
+<h1>log in</h1>
+
+<div>
+	@if ctx.form_error != ''
+	<p>error: @ctx.form_error</p>
+	@end
+
+	@if ctx.is_logged_in()
+	<p>you are already logged in as @{user.get_name()}!</p>
+	<a href="/api/user/logout">log out</a>
+	@else
+	<form action="/api/user/login" method="post">
+		<label for="username">username:</label>
+		<input type="text" name="username" id="username">
+		<br>
+		<label for="password">password:</label>
+		<input type="password" name="password" id="password">
+		<br>
+		<input type="submit" value="log in">
+	</form>
+	@end
+</div>
+
+@include 'partial/footer.html'

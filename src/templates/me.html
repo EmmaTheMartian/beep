@@ -1,0 +1,46 @@
+@include 'partial/header.html'
+
+@if ctx.is_logged_in()
+
+<h1>welcome, @{user.get_name()} (@@@user.username)</h1>
+<div>
+	<form action="/api/post/new_post" method="post">
+		<h2>new post:</h2>
+		<input
+			type="text"
+			name="title"
+			id="title"
+			minlength="1"
+			maxlength="@app.config.post.title_max_len"
+		>
+		<br>
+		<textarea
+			name="body"
+			id="body"
+			minlength="1"
+			maxlength="@app.config.post.body_max_len"
+		></textarea>
+		<br>
+		<input type="submit" value="post!">
+	</form>
+</div>
+<div>
+	<h2>posts:</h2>
+	@for post in user.posts
+	@include 'components/post.html'
+	@end
+</div>
+<div>
+	<h2>user info:</h2>
+	<p>id: @user.id</p>
+	<p>username: @user.username</p>
+	<p>display name: @user.get_name()</p>
+	<p><a href="/api/user/logout">log out</a></p>
+	<p><a href="/api/user/full_logout">log out of all devices</a></p>
+</div>
+
+@else
+<p>uh oh, you are not logged in! you can log in <a href="/login">here</a></p>
+@end
+
+@include 'partial/footer.html'

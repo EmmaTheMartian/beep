@@ -1,0 +1,50 @@
+plugins = [ 'v' ]
+
+task:db.init = {
+	description = 'Initialize and start a test postgres database'
+	category = 'db'
+	run = 'docker run -it \
+		--name beep-database \
+		-e POSTGRES_DB=beep \
+		-e POSTGRES_USER=beep \
+		-e POSTGRES_PASSWORD=beep \
+		--mount source=beep-data,target=/var/lib/postgresql/data \
+		-p 5432:5432 \
+		postgres:15'
+}
+
+task:db.start = {
+	description = 'Start the docker image for the database'
+	category = 'db'
+	run = 'docker start beep-database'
+}
+
+task:db.stop = {
+	description = 'Stop the docker image for the database'
+	category = 'db'
+	run = 'docker stop beep-database'
+}
+
+task:db.login = {
+	description = 'Log into and modify the database'
+	category = 'db'
+	run = 'docker exec -it beep-database psql -h localhost -p 5432 -d beep -U beep -W'
+}
+
+task:db.shell = {
+	description = 'Open a shell in the database'
+	category = 'db'
+	run = 'docker exec -it beep-database sh'
+}
+
+task:db.dangerous.nuke = {
+	description = 'Nuke the docker image AND ITS DATA. This will delete **EVERYTHING** in the database.'
+	category = 'db'
+	run = 'docker rm beep-database && docker volume rm beep-data'
+}
+
+task:run = {
+	description = 'Run beep'
+	category = 'run'
+	run = '${v} -d veb_livereload watch run ${v_main}'
+}
