@@ -123,6 +123,26 @@ fn (mut app App) api_user_full_logout(mut ctx Context) veb.Result {
 	return ctx.redirect('/login')
 }
 
+@['/api/user/set_nickname'; post]
+fn (mut app App) api_user_set_nickname(mut ctx Context) veb.Result {
+	mut nickname := ?string(ctx.form['nickname'] or { '' })
+	if (nickname or { '' }) == '' {
+		nickname = none
+	}
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+	sql app.db {
+		update User set nickname = nickname where id == user.id
+	} or {
+		ctx.error('failed to change nickname')
+		eprintln('failed to update nickname for ${user} (${user.nickname} -> ${nickname})')
+		return ctx.redirect('/me')
+	}
+	return ctx.redirect('/me')
+}
+
 ////// Posts //////
 
 @['/api/post/new_post'; post]

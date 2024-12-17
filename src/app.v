@@ -5,12 +5,6 @@ import auth
 import db.pg
 import entity { User, Post }
 
-pub struct Context {
-	veb.Context
-pub mut:
-	title string
-}
-
 pub struct App {
 pub:
 	config Config
@@ -86,10 +80,16 @@ pub fn (app &App) whoami(mut ctx Context) ?User {
 	return none
 }
 
-pub fn (ctx &Context) is_logged_in() bool {
-	return ctx.get_cookie('token') or { '' } != ''
-}
-
 pub fn (app &App) get_unknown_user() User {
 	return User{ username: 'unknown' }
+}
+
+pub struct Context {
+	veb.Context
+pub mut:
+	title string
+}
+
+pub fn (ctx &Context) is_logged_in() bool {
+	return ctx.get_cookie('token') or { '' } != ''
 }

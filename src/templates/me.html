@@ -12,6 +12,7 @@
 			id="title"
 			minlength="1"
 			maxlength="@app.config.post.title_max_len"
+			placeholder="title"
 		>
 		<br>
 		<textarea
@@ -19,6 +20,9 @@
 			id="body"
 			minlength="1"
 			maxlength="@app.config.post.body_max_len"
+			rows="10"
+			cols="30"
+			placeholder="body"
 		></textarea>
 		<br>
 		<input type="submit" value="post!">
@@ -37,6 +41,26 @@
 	<p>display name: @user.get_name()</p>
 	<p><a href="/api/user/logout">log out</a></p>
 	<p><a href="/api/user/full_logout">log out of all devices</a></p>
+</div>
+<div>
+	<h2>settings:</h2>
+	<form action="/api/user/set_nickname" method="post">
+		<label for="nickname">nickname:</label>
+		<input
+			type="text"
+			name="nickname"
+			id="nickname"
+			pattern="@app.config.user.nickname_pattern"
+			minlength="@app.config.user.nickname_min_len"
+			maxlength="@app.config.user.nickname_max_len"
+			value="@{user.nickname or { '' }}"
+			required
+		>
+		<input type="submit" value="update">
+	</form>
+	<form action="/api/user/set_nickname" method="post">
+		<input type="submit" value="reset nickname">
+	</form>
 </div>
 
 @else

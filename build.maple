@@ -48,3 +48,9 @@ task:run = {
 	category = 'run'
 	run = '${v} -d veb_livereload watch run ${v_main} config.maple'
 }
+
+task:run.real = {
+	description = 'Run beep using config.real.maple'
+	category = 'run'
+	run = '${v} -d veb_livereload watch run ${v_main} config.real.maple'
+}

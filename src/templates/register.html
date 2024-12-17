@@ -13,10 +13,26 @@
 	@else
 	<form action="/api/user/register" method="post">
 		<label for="username">username:</label>
-		<input type="text" name="username" id="username">
+		<input
+			type="text"
+			name="username"
+			id="username"
+			pattern="@app.config.user.username_pattern"
+			minlength="@app.config.user.username_min_len"
+			maxlength="@app.config.user.username_max_len"
+			required
+		>
 		<br>
 		<label for="password">password:</label>
-		<input type="password" name="password" id="password">
+		<input
+			type="password"
+			name="password"
+			id="password"
+			pattern="@app.config.user.password_pattern"
+			minlength="@app.config.user.password_min_len"
+			maxlength="@app.config.user.password_max_len"
+			required
+		>
 		<br>
 		<input type="submit" value="register">
 	</form>
