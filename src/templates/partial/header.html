@@ -13,6 +13,11 @@
 <body>
 
 	<header>
+		@if app.config.dev_mode
+		<span><strong>dev mode</strong></span>
+		-
+		@end
+
 		<a href="/">home</a>
 		-
 
@@ -24,7 +29,7 @@
 		@if ctx.is_logged_in()
 		<a href="/me">profile</a>
 		-
-		<a href="/api/full_logout">log out</a>
+		<a href="/api/user/logout">log out</a>
 		@else
 		<a href="/login">log in</a>
 		<span>or</span>

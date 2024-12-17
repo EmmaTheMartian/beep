@@ -29,3 +29,6 @@ bin/
 
 # Local Clockwork install
 /clockwork/
+
+# "Real" config (contains secrets and such)
+/config.real.maple

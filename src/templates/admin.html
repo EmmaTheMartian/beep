@@ -13,7 +13,7 @@
 	<div>
 		@for u in app.get_users()
 		<div>
-			<a href="/user/@u.id">@u.get_name() (@@@u.username) [@u.id]</a>
+			<a href="/user/@u.username">@u.get_name() (@@@u.username) [@u.id]</a>
 			<p>muted=@u.muted, admin=@u.admin</p>
 			<p>created_at=@u.created_at</p>
 		</div>

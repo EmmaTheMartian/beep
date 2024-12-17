@@ -12,15 +12,6 @@ postgres = {
 	db = 'beep'
 }
 
-// At least one must be enabled for beep to work.
-oauth = {
-	github = {
-		enabled = true
-		id = ''
-		secret = ''
-	}
-}
-
 post = {
 	title_max_len = 50
 	body_max_len = 500

@@ -1,7 +1,8 @@
 // From: https://github.com/vlang/v/blob/1fae506900c79e3aafc00e08e1f861fc7cbf8012/vlib/veb/auth/auth.v
 // The original file's source is licensed under MIT.
 
-// This "fork" re-introduces the `ip` field of each token for additional security.
+// This fork re-introduces the `ip` field of each token for additional security,
+// along with delete_tokens_for_ip
 
 module auth
 

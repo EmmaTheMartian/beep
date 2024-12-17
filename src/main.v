@@ -4,6 +4,7 @@ import db.pg
 import veb
 import auth
 import entity
+import os
 
 fn init_db(db pg.DB) ! {
 	sql db {
@@ -13,7 +14,7 @@ fn init_db(db pg.DB) ! {
 }
 
 fn main() {
-	config := load_config_from('config.maple')
+	config := load_config_from(os.args[1])
 
 	mut db := pg.connect(pg.Config{
 		host:     config.postgres.host

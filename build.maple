@@ -1,7 +1,7 @@
 plugins = [ 'v' ]
 
 task:db.init = {
-	description = 'Initialize and start a test postgres database'
+	description = 'Initialize and start a local Postgres database via Docker'
 	category = 'db'
 	run = 'docker run -it \
 		--name beep-database \
@@ -14,31 +14,31 @@ task:db.init = {
 }
 
 task:db.start = {
-	description = 'Start the docker image for the database'
+	description = 'Start the docker image for the local database'
 	category = 'db'
 	run = 'docker start beep-database'
 }
 
 task:db.stop = {
-	description = 'Stop the docker image for the database'
+	description = 'Stop the docker image for the local database'
 	category = 'db'
 	run = 'docker stop beep-database'
 }
 
 task:db.login = {
-	description = 'Log into and modify the database'
+	description = 'Log into and modify the local database'
 	category = 'db'
 	run = 'docker exec -it beep-database psql -h localhost -p 5432 -d beep -U beep -W'
 }
 
 task:db.shell = {
-	description = 'Open a shell in the database'
+	description = 'Open a shell in the local database'
 	category = 'db'
 	run = 'docker exec -it beep-database sh'
 }
 
 task:db.dangerous.nuke = {
-	description = 'Nuke the docker image AND ITS DATA. This will delete **EVERYTHING** in the database.'
+	description = 'Delete the docker image AND ITS DATA. This will delete **EVERYTHING** in the database.'
 	category = 'db'
 	run = 'docker rm beep-database && docker volume rm beep-data'
 }
@@ -46,5 +46,5 @@ task:db.dangerous.nuke = {
 task:run = {
 	description = 'Run beep'
 	category = 'run'
-	run = '${v} -d veb_livereload watch run ${v_main}'
+	run = '${v} -d veb_livereload watch run ${v_main} config.maple'
 }
