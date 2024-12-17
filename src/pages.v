@@ -47,3 +47,14 @@ fn (mut app App) user(mut ctx Context, username string) veb.Result {
 	ctx.title = 'beep - ${user.get_name()}'
 	return $veb.html()
 }
+
+@['/post/:post_id']
+fn (mut app App) post(mut ctx Context, post_id int) veb.Result {
+	post := app.get_post_by_id(post_id) or {
+		ctx.error('no such post')
+		return ctx.redirect('/')
+	}
+	ctx.title = 'beep - ${post.title}'
+	user := app.whoami(mut ctx) or { User{} }
+	return $veb.html()
+}

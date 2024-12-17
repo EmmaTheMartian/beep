@@ -15,8 +15,6 @@ pub mut:
 	muted bool
 	admin bool
 
-	posts []Post @[fkey: 'id']
-
 	created_at time.Time = time.now()
 }
 

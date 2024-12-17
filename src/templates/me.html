@@ -13,6 +13,7 @@
 			minlength="1"
 			maxlength="@app.config.post.title_max_len"
 			placeholder="title"
+			required
 		>
 		<br>
 		<textarea
@@ -23,6 +24,7 @@
 			rows="10"
 			cols="30"
 			placeholder="body"
+			required
 		></textarea>
 		<br>
 		<input type="submit" value="post!">
@@ -30,8 +32,8 @@
 </div>
 <div>
 	<h2>posts:</h2>
-	@for post in user.posts
-	@include 'components/post.html'
+	@for post in app.get_posts_from_user(user.id)
+	@include 'components/post_small.html'
 	@end
 </div>
 <div>

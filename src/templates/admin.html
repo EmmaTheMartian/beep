@@ -16,6 +16,40 @@
 			<a href="/user/@u.username">@u.get_name() (@@@u.username) [@u.id]</a>
 			<p>muted=@u.muted, admin=@u.admin</p>
 			<p>created_at=@u.created_at</p>
+			<form action="/api/user/set_muted" method="post">
+				<input
+					type="text"
+					name="id"
+					id="id"
+					value="@u.id"
+					required
+					readonly
+					hidden
+				>
+				@if !user.muted
+				<input
+					type="checkbox"
+					name="muted"
+					id="muted"
+					value="true"
+					checked
+					readonly
+					hidden
+				>
+				<input type="submit" value="mute">
+				@else
+				<input
+					type="checkbox"
+					name="muted"
+					id="muted"
+					value="false"
+					checked
+					readonly
+					hidden
+				>
+				<input type="submit" value="unmute">
+				@end
+			</form>
 		</div>
 		<hr>
 		@end

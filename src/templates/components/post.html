@@ -1,5 +1,41 @@
 <div>
-	<p><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</p>
+	<h2><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</h2>
+	<p>likes: @{app.get_net_likes_for_post(post.id)}</p>
 	<p>@post.body</p>
 	<p>posted at: @post.posted_at</p>
+
+	@if ctx.is_logged_in()
+	<script>
+		const like = async (id) => {
+			await fetch('/api/post/toggle_like?id=' + id, {
+				method: 'GET'
+			})
+			window.location.reload()
+		}
+	</script>
+
+	<button onclick="like(@post.id)">
+		@if app.does_user_like_post(user.id, post.id)
+		liked!
+		@else
+		like
+		@end
+	</button>
+	@end
+
+	@if app.config.dev_mode || (ctx.is_logged_in() && user.admin) || (ctx.is_logged_in() && post.author_id == user.id)
+	<form action="/api/post/delete" method="post">
+		<input
+			type="number"
+			name="id"
+			id="id"
+			placeholder="post id"
+			value="@post.id"
+			required
+			readonly
+			hidden
+		>
+		<input type="submit" value="delete">
+	</form>
+	@end
 </div>

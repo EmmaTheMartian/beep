@@ -10,6 +10,8 @@ fn init_db(db pg.DB) ! {
 	sql db {
 		create table entity.User
 		create table entity.Post
+		create table entity.Like
+		create table entity.LikeCache
 	}!
 }
 
@@ -41,4 +43,19 @@ fn main() {
 	}
 
 	veb.run[App, Context](mut app, app.config.http.port)
+}
+
+// bad users, no RCE!
+fn sanatize(text string) string {
+	return text
+		.replace('&', '&amp;')
+		.replace('<', '&lt;')
+		.replace('>', '&gt;')
+		.replace('"', '&quot;') // where did the `e` go??
+		.replace('\'', '&#039;') // and what is this?!?!?
+	// in the above two comments, you can see me (emma) having spontaneous
+	// anger at old spec design, where "quote" becomes "quot" and a single
+	// quote is an incomprehensible string of numbers.
+	// my proposition: `dquote` and `squote`.
+	// (end rant)
 }
