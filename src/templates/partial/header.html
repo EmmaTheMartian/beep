@@ -24,7 +24,7 @@
 		<a href="/">home</a>
 		-
 
-		@if app.config.dev_mode
+		@if app.config.dev_mode || (ctx.is_logged_in() && user.admin)
 		<a href="/admin">admin</a>
 		-
 		@end
@@ -44,6 +44,6 @@
 		<!-- TODO: fix this lol -->
 		@if ctx.form_error != ''
 		<div>
-			<p><strong>error:</strong> ctx.form_error</p>
+			<p><strong>error:</strong> @ctx.form_error</p>
 		</div>
 		@end

@@ -169,6 +169,17 @@ pub fn (app &App) does_user_dislike_post(user_id int, post_id int) bool {
 	return !likes.first().is_like
 }
 
+pub fn (app &App) does_user_like_or_dislike_post(user_id int, post_id int) bool {
+	likes := sql app.db {
+		select from Like where user_id == user_id && post_id == post_id
+	} or { [] }
+	if likes.len > 1 {
+		// something is very wrong lol
+		eprintln('a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
+	}
+	return likes.len == 1
+}
+
 pub fn (app &App) get_net_likes_for_post(post_id int) int {
 	// check cache
 	cache := sql app.db {

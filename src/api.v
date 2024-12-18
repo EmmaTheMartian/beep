@@ -343,8 +343,8 @@ fn (mut app App) api_post_delete(mut ctx Context, id int) veb.Result {
 	}
 }
 
-@['/api/post/toggle_like']
-fn (mut app App) api_post_toggle_like(mut ctx Context, id int) veb.Result {
+@['/api/post/like']
+fn (mut app App) api_post_like(mut ctx Context, id int) veb.Result {
 	user := app.whoami(mut ctx) or {
 		return ctx.unauthorized('not logged in')
 	}
@@ -364,6 +364,15 @@ fn (mut app App) api_post_toggle_like(mut ctx Context, id int) veb.Result {
 		}
 		return ctx.ok('unliked post')
 	} else {
+		// remove the old dislike, if it exists
+		if app.does_user_dislike_post(user.id, post.id) {
+			sql app.db {
+				delete from Like where user_id == user.id && post_id == post.id
+			} or {
+				eprintln('user ${user.id} failed to remove dislike on post ${id} when liking it')
+			}
+		}
+
 		like := Like{
 			user_id: user.id
 			post_id: post.id
@@ -378,5 +387,52 @@ fn (mut app App) api_post_toggle_like(mut ctx Context, id int) veb.Result {
 			return ctx.server_error('failed to like post')
 		}
 		return ctx.ok('liked post')
+	}
+}
+
+@['/api/post/dislike']
+fn (mut app App) api_post_dislike(mut ctx Context, id int) veb.Result {
+	user := app.whoami(mut ctx) or {
+		return ctx.unauthorized('not logged in')
+	}
+
+	post := app.get_post_by_id(id) or {
+		return ctx.server_error('post does not exist')
+	}
+
+	if app.does_user_dislike_post(user.id, post.id) {
+		sql app.db {
+			delete from Like where user_id == user.id && post_id == post.id
+			// yeet the old cached like value
+			delete from LikeCache where post_id == post.id
+		} or {
+			eprintln('user ${user.id} failed to unlike post ${id}')
+			return ctx.server_error('failed to unlike post')
+		}
+		return ctx.ok('undisliked post')
+	} else {
+		// remove the old like, if it exists
+		if app.does_user_like_post(user.id, post.id) {
+			sql app.db {
+				delete from Like where user_id == user.id && post_id == post.id
+			} or {
+				eprintln('user ${user.id} failed to remove like on post ${id} when disliking it')
+			}
+		}
+
+		like := Like{
+			user_id: user.id
+			post_id: post.id
+			is_like: false
+		}
+		sql app.db {
+			insert like into Like
+			// yeet the old cached like value
+			delete from LikeCache where post_id == post.id
+		} or {
+			eprintln('user ${user.id} failed to dislike post ${id}')
+			return ctx.server_error('failed to dislike post')
+		}
+		return ctx.ok('disliked post')
 	}
 }

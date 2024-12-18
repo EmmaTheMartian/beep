@@ -6,3 +6,15 @@
 .post p {
 	margin: 0;
 }
+
+pre {
+	white-space: pre-wrap;
+}
+
+/*
+ * some themes make input fields display: block, which overrides my hidden
+ * attribute. to resolve that, i will just override the override.
+ */
+input[hidden] {
+	display: none !important;
+}

@@ -20,7 +20,7 @@ post = {
 	title_pattern = '(.|\s)*'
 
 	body_min_len = 1
-	body_max_len = 500
+	body_max_len = 1000
 	body_pattern = '(.|\s)*'
 }
 

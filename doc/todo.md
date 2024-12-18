@@ -4,11 +4,8 @@
 
 ## in-progress
 
-- [/] post:likes/dislikes
-
 ## planing
 
-- [ ] site:stylesheet (and a toggle for html-only mode)
 - [ ] post:mentioning ('tagging') other users in posts
 - [ ] post:replies
 - [ ] post:tags ('hashtags')
@@ -26,3 +23,6 @@
 - [x] user:nicknames
 - [x] user:bio/about me
 - [x] user:listed pronouns
+- [x] post:likes/dislikes
+- [ ] ~~site:stylesheet (and a toggle for html-only mode)~~
+	- replaced with per-user optional stylesheets

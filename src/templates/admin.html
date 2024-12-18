@@ -7,53 +7,19 @@
 @else
 
 <h1>admin dashboard</h1>
-<p>logged in as: @user</p>
+<p>logged in as:</p>
+<pre>@user</pre>
 <div>
 	<h2>user list:</h2>
-	<div>
+	<ul>
 		@for u in app.get_users()
-		<div>
-			<a href="/user/@u.username">@u.get_name() (@@@u.username) [@u.id]</a>
-			<p>muted=@u.muted, admin=@u.admin</p>
-			<p>created_at=@u.created_at</p>
-			<form action="/api/user/set_muted" method="post">
-				<input
-					type="text"
-					name="id"
-					id="id"
-					value="@u.id"
-					required
-					readonly
-					hidden
-				>
-				@if !user.muted
-				<input
-					type="checkbox"
-					name="muted"
-					id="muted"
-					value="true"
-					checked
-					readonly
-					hidden
-				>
-				<input type="submit" value="mute">
-				@else
-				<input
-					type="checkbox"
-					name="muted"
-					id="muted"
-					value="false"
-					checked
-					readonly
-					hidden
-				>
-				<input type="submit" value="unmute">
-				@end
-			</form>
-		</div>
-		<hr>
+		<li>
+			<a href="/user/@u.username">@u.get_name()</a>
+			(@@@u.username) [@u.id]
+			{muted=@u.muted, admin=@u.admin, created_at=@u.created_at}
+		</li>
 		@end
-	</div>
+	</ul>
 </div>
 
 @end

@@ -1,13 +1,20 @@
 <div class="post post-full">
 	<h2><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</h2>
-	<p>@post.body</p>
+	<pre>@post.body</pre>
 	<p><em>likes: @{app.get_net_likes_for_post(post.id)}</em></p>
 	<p><em>posted at: @post.posted_at</em></p>
 
 	@if ctx.is_logged_in()
 	<script>
 		const like = async (id) => {
-			await fetch('/api/post/toggle_like?id=' + id, {
+			await fetch('/api/post/like?id=' + id, {
+				method: 'GET'
+			})
+			window.location.reload()
+		}
+
+		const dislike = async (id) => {
+			await fetch('/api/post/dislike?id=' + id, {
 				method: 'GET'
 			})
 			window.location.reload()
@@ -16,13 +23,22 @@
 
 	<br>
 
-	<button onclick="like(@post.id)">
-		@if app.does_user_like_post(user.id, post.id)
-		liked!
-		@else
-		like
-		@end
-	</button>
+	<div>
+		<button onclick="like(@post.id)">
+			@if app.does_user_like_post(user.id, post.id)
+			liked :D
+			@else
+			like
+			@end
+		</button>
+		<button onclick="dislike(@post.id)">
+			@if app.does_user_dislike_post(user.id, post.id)
+			disliked D:
+			@else
+			dislike
+			@end
+		</button>
+	</div>
 	@end
 
 	@if app.config.dev_mode || (ctx.is_logged_in() && user.admin) || (ctx.is_logged_in() && post.author_id == user.id)
