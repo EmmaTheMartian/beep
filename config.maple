@@ -2,7 +2,7 @@ dev_mode = false
 static_path = 'src/static'
 
 instance = {
-	name = 'beeper'
+	name = 'beep'
 	welcome = 'welcome to beep!'
 }
 
