@@ -2,6 +2,7 @@
 	<h2>settings:</h2>
 	<form action="/api/user/set_bio" method="post">
 		<label for="bio">bio:</label>
+		<br>
 		<textarea
 			name="bio"
 			id="bio"
@@ -25,6 +26,7 @@
 			value="@user.pronouns"
 			required
 		>
+		<br>
 		<input type="submit" value="save">
 	</form>
 	<form action="/api/user/set_nickname" method="post">

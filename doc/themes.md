@@ -13,12 +13,17 @@ here is a list of themes that work with beep and themes for beep!
 > note that these themes were **not** made specifically for beep, they just work
 > well out-of-the-box with it!
 
-| name              | source                                 | css theme url                                                 |
-|-------------------|----------------------------------------|---------------------------------------------------------------|
-| sakura            | <https://github.com/oxalorg/sakura>    | https://cdn.jsdelivr.net/npm/sakura.css/css/sakura.css        |
-| water.css (auto)  | <https://github.com/kognise/water.css> | https://cdn.jsdelivr.net/npm/water.css@2/out/water.min.css    |
-| water.css (dark)  | <https://github.com/kognise/water.css> | https://cdn.jsdelivr.net/npm/water.css@2/out/dark.min.css     |
-| water.css (light) | <https://github.com/kognise/water.css> | https://cdn.jsdelivr.net/npm/water.css@2/out/light.min.css    |
+> there are also *tons* of drop-in css themes out in the wild, so the list here
+> is not even close to comprehensive. these are just my personal picks that i
+> found to be comfy with beep!
+
+| name                          | source                                  | css theme url                                               |
+|-------------------------------|-----------------------------------------|-------------------------------------------------------------|
+| sakura                        | <https://github.com/oxalorg/sakura>     | https://cdn.jsdelivr.net/npm/sakura.css/css/sakura.css      |
+| water.css (auto)              | <https://github.com/kognise/water.css>  | https://cdn.jsdelivr.net/npm/water.css@2/out/water.min.css  |
+| water.css (dark)              | <https://github.com/kognise/water.css>  | https://cdn.jsdelivr.net/npm/water.css@2/out/dark.min.css   |
+| water.css (light)             | <https://github.com/kognise/water.css>  | https://cdn.jsdelivr.net/npm/water.css@2/out/light.min.css  |
+| kacit                         | <https://github.com/Kimeiga/kacit>      | https://cdn.rawgit.com/Kimeiga/kacit/b3f813ed/kacit.min.css |
 
 > here is a big list of drop-in themes:
 > <https://github.com/dohliam/dropin-minimal-css>
