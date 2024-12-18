@@ -2,7 +2,6 @@ module entity
 
 import time
 
-@[json: 'user']
 pub struct User {
 pub mut:
 	id       int    @[primary; sql: serial]
@@ -31,4 +30,11 @@ pub fn (user User) get_name() string {
 @[inline]
 pub fn (user User) get_theme() string {
 	return user.theme or { '' }
+}
+
+@[inline]
+pub fn (user User) to_str_without_sensitive_data() string {
+	return user.str()
+		.replace(user.password, '*'.repeat(16))
+		.replace(user.password_salt, '*'.repeat(16))
 }

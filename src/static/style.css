@@ -7,6 +7,10 @@
 	margin: 0;
 }
 
+.post + .post {
+	margin-top: 6px;
+}
+
 pre {
 	white-space: pre-wrap;
 }

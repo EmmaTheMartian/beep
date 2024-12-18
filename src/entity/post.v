@@ -2,7 +2,6 @@ module entity
 
 import time
 
-@[json: 'post']
 pub struct Post {
 pub mut:
 	id        int @[primary; sql: serial]

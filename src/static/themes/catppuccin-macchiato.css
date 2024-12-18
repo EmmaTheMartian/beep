@@ -1,0 +1,61 @@
+@import url('https://cdn.jsdelivr.net/npm/water.css@2/out/dark.min.css');
+@import url('https://unpkg.com/@catppuccin/palette/css/catppuccin.css');
+
+:root {
+	--background-body: var(--ctp-macchiato-base);
+	--background: var(--ctp-macchiato-mantle);
+	--background-alt: var(--ctp-macchiato-crust);
+	--selection: var(--ctp-macchiato-overlay-2);
+	--text-main: var(--ctp-macchiato-text);
+	--text-bright: var(--ctp-macchiato-overlay-1);
+	--text-muted: var(--ctp-macchiato-subtext-0);
+	--links: var(--accent);
+	--focus: var(--accent);
+	--border: var(--accent);
+	--code: var(--ctp-macchiato-text);
+	--button-hover: var(--ctp-macchiato-mantle);
+	--scrollbar-thumb: var(--accent);
+	--form-placeholder: var(--ctp-macchiato-overlay-1);
+	--form-text: var(--ctp-macchiato-text);
+	--variable: var(--ctp-macchiato-pink);
+	--highlight: var(--ctp-macchiato-blue);
+	--select-arrow: var(--accent);
+}
+
+input {
+	border: 1px solid var(--border);
+	margin-right: none;
+	width: calc(100% - 2px);
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="url"] {
+	width: calc(100% - 22px);
+}
+
+input[type="button"],
+input[type="submit"] {
+	width: 100%;
+}
+
+textarea {
+	border: 1px solid var(--border);
+	width: 100%;
+	padding-right: 10px;
+	padding-left: 10px;
+	margin-right: none;
+}
+
+.post {
+	border: 1px solid var(--border);
+	width: calc(100% - 20px);
+	border-radius: 6px;
+	padding: 10px;
+}
+
+.post.post-full #id {
+	display: none;
+}

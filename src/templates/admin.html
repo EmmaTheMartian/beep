@@ -7,8 +7,22 @@
 @else
 
 <h1>admin dashboard</h1>
+
 <p>logged in as:</p>
-<pre>@user</pre>
+<details>
+	<summary>show user details (<strong>SENSITIVE DATA IS CENSORED BUT FOR THE SAKE OF GOOD PRACTICE, DO NOT SHOW THIS DATA TO ANYONE</strong>)</summary>
+	<pre>@user.to_str_without_sensitive_data()</pre>
+</details>
+
+<div>
+	<h2>site settings:</h2>
+	<form action="/api/site/set_motd" method="post">
+		<label for="motd">message of the day (motd): </label>
+		<input type="text" name="motd" id="motd" value="@app.get_motd()">
+		<input type="submit" value="save">
+	</form>
+</div>
+
 <div>
 	<h2>user list:</h2>
 	<ul>

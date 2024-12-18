@@ -2,7 +2,7 @@ module main
 
 import veb
 import auth
-import entity { User, Post, Like, LikeCache }
+import entity { Site, User, Post, Like, LikeCache }
 
 ////// Users //////
 
@@ -434,5 +434,31 @@ fn (mut app App) api_post_dislike(mut ctx Context, id int) veb.Result {
 			return ctx.server_error('failed to dislike post')
 		}
 		return ctx.ok('disliked post')
+	}
+}
+
+////// Site //////
+
+@['/api/site/set_motd'; post]
+fn (mut app App) api_site_set_motd(mut ctx Context, motd string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	if user.admin {
+		sql app.db {
+			update Site set motd = motd where id == 1
+		} or {
+			ctx.error('failed to set motd')
+			eprintln('failed to set motd: ${motd}')
+			return ctx.redirect('/')
+		}
+		println('set motd to: ${motd}')
+		return ctx.redirect('/')
+	} else {
+		ctx.error('insufficient permissions!')
+		eprintln('insufficient perms to set motd to: ${motd} (${user.id})')
+		return ctx.redirect('/')
 	}
 }

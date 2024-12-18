@@ -4,10 +4,10 @@
 
 ## in-progress
 
+- [ ] post:mentioning ('tagging') other users in posts
+
 ## planing
 
-- [ ] site:message of the day (admins can add a welcome message displayed on index.html)
-- [ ] post:mentioning ('tagging') other users in posts
 - [ ] post:replies
 - [ ] post:tags ('hashtags')
 - [ ] post:images (should have a config.maple toggle to enable/disable)
@@ -27,3 +27,4 @@
 - [x] post:likes/dislikes
 - [ ] ~~site:stylesheet (and a toggle for html-only mode)~~
 	- replaced with per-user optional stylesheets
+- [x] site:message of the day (admins can add a welcome message displayed on index.html)

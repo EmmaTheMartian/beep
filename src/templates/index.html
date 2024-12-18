@@ -2,8 +2,8 @@
 
 <h1>@app.config.instance.welcome</h1>
 
-@if ctx.is_logged_in()
-<p>logged in as: @{user.get_name()}</p>
+@if motd != ''
+<p><em>@motd</em></p>
 @end
 
 <div>

@@ -3,7 +3,7 @@ module main
 import veb
 import db.pg
 import auth
-import entity { User, Post, Like, LikeCache }
+import entity { Site, User, Post, Like, LikeCache }
 
 pub struct App {
 	veb.StaticHandler
@@ -219,4 +219,28 @@ pub fn (app &App) get_net_likes_for_post(post_id int) int {
 	}
 
 	return likes
+}
+
+pub fn (app &App) get_or_create_site_config() Site {
+	configs := sql app.db {
+		select from entity.Site
+	} or { [] }
+	if configs.len == 0 {
+		// make the site config
+		site_config := entity.Site{ }
+		sql app.db {
+			insert site_config into entity.Site
+		} or {
+			panic('failed to create site config (${err})')
+		}
+	} else if configs.len > 1 {
+		// this should never happen
+		panic('there are multiple site configs')
+	}
+	return configs[0]
+}
+
+pub fn (app &App) get_motd() string {
+	site := app.get_or_create_site_config()
+	return site.motd
 }

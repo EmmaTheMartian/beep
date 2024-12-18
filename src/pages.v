@@ -8,6 +8,7 @@ fn (mut app App) index(mut ctx Context) veb.Result {
 	user := app.whoami(mut ctx) or { User{} }
 	recent_posts := app.get_recent_posts()
 	pinned_posts := app.get_pinned_posts()
+	motd := app.get_motd()
 	return $veb.html()
 }
 

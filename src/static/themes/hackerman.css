@@ -1,0 +1,15 @@
+@import url('https://unpkg.com/simpledotcss/simple.min.css');
+
+:root {
+	color-scheme: dark;
+	--bg: black;
+	--accent-bg: black;
+	--text: green;
+	--text-light: light-green;
+	--accent: green;
+	--accent-hover: light-green
+	--accent-text: black;
+	--code: green;
+	--preformatted: green;
+	--disabled: #333;
+}

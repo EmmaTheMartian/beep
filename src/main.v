@@ -8,6 +8,7 @@ import os
 
 fn init_db(db pg.DB) ! {
 	sql db {
+		create table entity.Site
 		create table entity.User
 		create table entity.Post
 		create table entity.Like
@@ -47,6 +48,9 @@ fn main() {
 
 	app.mount_static_folder_at(app.config.static_path, '/static')!
 	init_db(db)!
+
+	// make the website config, if it does not exist
+	app.get_or_create_site_config()
 
 	if config.dev_mode {
 		println('\033[1;31mNOTE: YOU ARE IN DEV MODE\033[0m')

@@ -49,6 +49,6 @@ user = {
 	bio_max_len = 200
 	bio_pattern = '(.|\s)*'
 
-	default_theme = ''
+	default_theme = 'https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css'
 	allow_changing_theme = true
 }

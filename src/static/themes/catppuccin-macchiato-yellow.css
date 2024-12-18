@@ -1,5 +1,5 @@
 @import url('/static/themes/catppuccin-macchiato.css');
 
 :root {
-	--accent: var(--ctp-macchiato-pink);
+	--accent: var(--ctp-macchiato-yellow);
 }
