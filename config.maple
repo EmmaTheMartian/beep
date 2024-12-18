@@ -15,18 +15,36 @@ postgres = {
 }
 
 post = {
+	title_min_len = 1
 	title_max_len = 50
+	title_pattern = '(.|\s)*'
+
+	body_min_len = 1
 	body_max_len = 500
+	body_pattern = '(.|\s)*'
 }
 
 user = {
 	username_min_len = 3
 	username_max_len = 20
 	username_pattern = '[a-z0-9_.]+'
+
 	nickname_min_len = 1
 	nickname_max_len = 20
-	nickname_pattern = '\S.*'
+	nickname_pattern = '(.|\s).*'
+
 	password_min_len = 12
 	password_max_len = 72
-	password_pattern = '.+'
+	password_pattern = '(.|\s)+'
+
+	pronouns_min_len = 0
+	pronouns_max_len = 30
+	pronouns_pattern = '(.|\s)*'
+
+	bio_min_len = 0
+	bio_max_len = 200
+	bio_pattern = '(.|\s)*'
+
+	default_theme = ''
+	allow_changing_theme = true
 }

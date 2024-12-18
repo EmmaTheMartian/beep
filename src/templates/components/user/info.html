@@ -1,0 +1,10 @@
+<div>
+	<h2>user info:</h2>
+	<p>id: @user.id</p>
+	<p>username: @user.username</p>
+	<p>display name: @user.get_name()</p>
+	@if app.logged_in_as(mut ctx, user.id)
+	<p><a href="/api/user/logout">log out</a></p>
+	<p><a href="/api/user/full_logout">log out of all devices</a></p>
+	@end
+</div>

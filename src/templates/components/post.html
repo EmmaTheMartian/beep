@@ -1,8 +1,8 @@
 <div class="post post-full">
 	<h2><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</h2>
-	<p>likes: @{app.get_net_likes_for_post(post.id)}</p>
 	<p>@post.body</p>
-	<p>posted at: @post.posted_at</p>
+	<p><em>likes: @{app.get_net_likes_for_post(post.id)}</em></p>
+	<p><em>posted at: @post.posted_at</em></p>
 
 	@if ctx.is_logged_in()
 	<script>
@@ -14,6 +14,8 @@
 		}
 	</script>
 
+	<br>
+
 	<button onclick="like(@post.id)">
 		@if app.does_user_like_post(user.id, post.id)
 		liked!
@@ -24,6 +26,8 @@
 	@end
 
 	@if app.config.dev_mode || (ctx.is_logged_in() && user.admin) || (ctx.is_logged_in() && post.author_id == user.id)
+	<hr>
+	<h4>admin powers:</h4>
 	<form action="/api/post/delete" method="post">
 		<input
 			type="number"
@@ -34,6 +38,7 @@
 			required
 			readonly
 			hidden
+			aria-hidden
 		>
 		<input type="submit" value="delete">
 	</form>

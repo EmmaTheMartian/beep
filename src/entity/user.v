@@ -17,6 +17,9 @@ pub mut:
 
 	theme ?string
 
+	bio      string
+	pronouns string
+
 	created_at time.Time = time.now()
 }
 

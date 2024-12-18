@@ -33,7 +33,11 @@ here is a list of themes that work with beep and themes for beep!
 
 ## built-in
 
-(todo :D)
+| name                      | based on (if applicable)        | css theme url                 |
+|---------------------------|---------------------------------|-------------------------------|
+| catppuccin-macchiato-pink | water.css + catpuccin macchiato | catppuccin-macchiato-pink.css |
 
 > beep also features some built-in themes, some of which are based on the themes
 > present in the "it just works" list!
+
+> make sure to prefix the url with `<instance url>/static/themes/`

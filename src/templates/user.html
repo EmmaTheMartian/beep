@@ -1,65 +1,9 @@
 @include 'partial/header.html'
 
-<h1>@{user.get_name()} (@@@user.username)
-	@if user.muted && user.admin
-	[muted admin??]
-	@else if user.muted
-	[muted]
-	@else if user.admin
-	[admin]
-	@end
-</h1>
-@if ctx.is_logged_in() && user.username == self.username
-<p>this is you!</p>
-@end
-<div>
-	<h2>posts:</h2>
-	@for post in app.get_posts_from_user(user.id)
-	@include 'components/post_small.html'
-	@end
-</div>
-<div>
-	<h2>user info:</h2>
-	<p>id: @user.id</p>
-	<p>username: @user.username</p>
-	<p>display name: @user.get_name()</p>
-</div>
-<div>
-	<h2>admin powers:</h2>
-	<form action="/api/user/set_muted" method="post">
-		<input
-			type="text"
-			name="id"
-			id="id"
-			value="@user.id"
-			required
-			readonly
-			hidden
-		>
-		@if !user.muted
-		<input
-			type="checkbox"
-			name="muted"
-			id="muted"
-			value="true"
-			checked
-			readonly
-			hidden
-		>
-		<input type="submit" value="mute">
-		@else
-		<input
-			type="checkbox"
-			name="muted"
-			id="muted"
-			value="false"
-			checked
-			readonly
-			hidden
-		>
-		<input type="submit" value="unmute">
-		@end
-	</form>
-</div>
+@include 'components/user/name.html'
+@include 'components/user/bio.html'
+@include 'components/user/posts.html'
+@include 'components/user/info.html'
+@include 'components/user/admin.html'
 
 @include 'partial/footer.html'

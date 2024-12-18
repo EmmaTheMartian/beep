@@ -1,0 +1,20 @@
+<h1>
+	@{user.get_name()}
+	(@@@user.username)
+
+	@if user.pronouns != ''
+	<h2>(@user.pronouns)</h2>
+	@end
+
+	@if user.muted && user.admin
+	[muted admin, somehow]
+	@else if user.muted
+	[muted]
+	@else if user.admin
+	[admin]
+	@end
+</h1>
+
+@if app.logged_in_as(mut ctx, user.id)
+<p>this is you!</p>
+@end

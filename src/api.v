@@ -8,19 +8,32 @@ import entity { User, Post, Like, LikeCache }
 
 @['/api/user/register'; post]
 fn (mut app App) api_user_register(mut ctx Context, username string, password string) veb.Result {
-	println('reg: ${username}')
-
 	if app.get_user_by_name(username) != none {
 		ctx.error('username taken')
 		return ctx.redirect('/register')
 	}
 
+	// validate username
+	if !app.validators.username.validate(username) {
+		ctx.error('invalid username')
+		return ctx.redirect('/register')
+	}
+
+	// validate password
+	if !app.validators.password.validate(password) {
+		ctx.error('invalid password')
+		return ctx.redirect('/register')
+	}
+
 	salt := auth.generate_salt()
-	//TODO: server-side username+password validation
-	user := User{
+	mut user := User{
 		username: username
 		password: auth.hash_password_with_salt(password, salt)
 		password_salt: salt
+	}
+
+	if app.config.user.default_theme != '' {
+		user.theme = app.config.user.default_theme
 	}
 
 	sql app.db {
@@ -29,6 +42,8 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 		eprintln('failed to insert user ${user}')
 		return ctx.redirect('/')
 	}
+
+	println('reg: ${username}')
 
 	if x := app.get_user_by_name(username) {
 		token := app.auth.add_token(x.id, ctx.ip()) or {
@@ -144,6 +159,12 @@ fn (mut app App) api_user_set_nickname(mut ctx Context, nickname string) veb.Res
 		sanatized_nickname = none
 	}
 
+	// validate
+	if sanatized_nickname != none && !app.validators.nickname.validate(sanatized_nickname or { '' }) {
+		ctx.error('invalid nickname')
+		return ctx.redirect('/me')
+	}
+
 	sql app.db {
 		update User set nickname = sanatized_nickname where id == user.id
 	} or {
@@ -180,6 +201,11 @@ fn (mut app App) api_user_set_muted(mut ctx Context, muted bool) veb.Result {
 
 @['/api/user/set_theme'; post]
 fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
+	if !app.config.user.allow_changing_theme {
+		ctx.error('this instance disallows changing themes :(')
+		return ctx.redirect('/me')
+	}
+
 	user := app.whoami(mut ctx) or {
 		ctx.error('you are not logged in!')
 		return ctx.redirect('/login')
@@ -190,13 +216,59 @@ fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
 		theme = sanatize(url).trim_space()
 	}
 
-	println('set theme to: ${theme}')
-
 	sql app.db {
 		update User set theme = theme where id == user.id
 	} or {
 		ctx.error('failed to change theme')
 		eprintln('failed to update theme for ${user} (${user.theme} -> ${theme})')
+		return ctx.redirect('/me')
+	}
+
+	return ctx.redirect('/me')
+}
+
+@['/api/user/set_pronouns'; post]
+fn (mut app App) api_user_set_pronouns(mut ctx Context, pronouns string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	clean_pronouns := sanatize(pronouns).trim_space()
+	if !app.validators.pronouns.validate(clean_pronouns) {
+		ctx.error('invalid pronouns')
+		return ctx.redirect('/me')
+	}
+
+	sql app.db {
+		update User set pronouns = clean_pronouns where id == user.id
+	} or {
+		ctx.error('failed to change pronouns')
+		eprintln('failed to update pronouns for ${user} (${user.pronouns} -> ${clean_pronouns})')
+		return ctx.redirect('/me')
+	}
+
+	return ctx.redirect('/me')
+}
+
+@['/api/user/set_bio'; post]
+fn (mut app App) api_user_set_bio(mut ctx Context, bio string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	clean_bio := sanatize(bio).trim_space()
+	if !app.validators.user_bio.validate(clean_bio) {
+		ctx.error('invalid bio')
+		return ctx.redirect('/me')
+	}
+
+	sql app.db {
+		update User set bio = clean_bio where id == user.id
+	} or {
+		ctx.error('failed to change bio')
+		eprintln('failed to update bio for ${user} (${user.bio} -> ${clean_bio})')
 		return ctx.redirect('/me')
 	}
 
@@ -214,6 +286,18 @@ fn (mut app App) api_post_new_post(mut ctx Context, title string, body string) v
 
 	if user.muted {
 		ctx.error('you are muted!')
+		return ctx.redirect('/me')
+	}
+
+	// validate title
+	if !app.validators.post_title.validate(title) {
+		ctx.error('invalid title')
+		return ctx.redirect('/me')
+	}
+
+	// validate body
+	if !app.validators.post_body.validate(body) {
+		ctx.error('invalid body')
 		return ctx.redirect('/me')
 	}
 

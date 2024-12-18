@@ -4,7 +4,7 @@
 
 ## in-progress
 
-- [.] post:likes/dislikes
+- [/] post:likes/dislikes
 
 ## planing
 
@@ -15,11 +15,14 @@
 - [ ] post:images (should have a config.maple toggle to enable/disable)
 - [ ] post:saving (add the post to a list of saved posts that a user can view later)
 - [ ] user:deletion
-- [ ] user:bio/about me
-- [ ] user:listed pronouns
 
 ## ideas
+
+- [ ] user:per-user post pins
+	- could be used as an alternative for a bio to include more information perhaps
 
 ## done
 
 - [x] user:nicknames
+- [x] user:bio/about me
+- [x] user:listed pronouns

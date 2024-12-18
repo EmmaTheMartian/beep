@@ -10,8 +10,18 @@ pub struct App {
 pub:
 	config Config
 pub mut:
-	db    pg.DB
-	auth  auth.Auth[pg.DB]
+	db         pg.DB
+	auth       auth.Auth[pg.DB]
+	validators struct {
+	pub:
+		username   StringValidator
+		password   StringValidator
+		nickname   StringValidator
+		pronouns   StringValidator
+		user_bio   StringValidator
+		post_title StringValidator
+		post_body  StringValidator
+	}
 }
 
 pub fn (app &App) get_user_by_name(username string) ?User {
@@ -124,6 +134,13 @@ pub fn (app &App) whoami(mut ctx Context) ?User {
 
 pub fn (app &App) get_unknown_user() User {
 	return User{ username: 'unknown' }
+}
+
+pub fn (app &App) logged_in_as(mut ctx Context, id int) bool {
+	if !ctx.is_logged_in() {
+		return false
+	}
+	return app.whoami(mut ctx) or { return false }.id == id
 }
 
 pub fn (app &App) does_user_like_post(user_id int, post_id int) bool {

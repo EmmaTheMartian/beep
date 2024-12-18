@@ -44,7 +44,6 @@ fn (mut app App) user(mut ctx Context, username string) veb.Result {
 		ctx.error('user not found')
 		return ctx.redirect('/')
 	}
-	self := app.whoami(mut ctx) or { User{} }
 	ctx.title = 'beep - ${user.get_name()}'
 	return $veb.html()
 }
