@@ -8,6 +8,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>@ctx.title</title>
 	@include 'assets/style.html'
+	@if ctx.is_logged_in() && user.theme != none
+	<link rel="stylesheet" href="@user.get_theme()">
+	@endif
 </head>
 
 <body>
@@ -39,6 +42,7 @@
 	</header>
 
 	<main>
+		<!-- TODO: fix this lol -->
 		@if ctx.form_error != ''
 		<div>
 			<p><strong>error:</strong> ctx.form_error</p>

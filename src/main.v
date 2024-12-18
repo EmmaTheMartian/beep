@@ -36,10 +36,12 @@ fn main() {
 		auth: auth.new(db)
 	}
 
+	app.mount_static_folder_at(app.config.static_path, '/static')!
+
 	init_db(db)!
 
 	if config.dev_mode {
-		println('NOTE: YOU ARE IN DEV MODE')
+		println('\033[1;31mNOTE: YOU ARE IN DEV MODE\033[0m')
 	}
 
 	veb.run[App, Context](mut app, app.config.http.port)

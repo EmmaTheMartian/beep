@@ -11,5 +11,7 @@ pub mut:
 	title  string
 	body   string
 
+	pinned bool
+
 	posted_at time.Time = time.now()
 }

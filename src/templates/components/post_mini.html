@@ -1,0 +1,6 @@
+<div class="post post-mini">
+	<p>
+		<a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a>:
+		<a href="/post/@post.id">@post.title</a>
+	</p>
+</div>

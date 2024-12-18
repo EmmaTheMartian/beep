@@ -15,10 +15,17 @@ pub mut:
 	muted bool
 	admin bool
 
+	theme ?string
+
 	created_at time.Time = time.now()
 }
 
 @[inline]
 pub fn (user User) get_name() string {
 	return user.nickname or { user.username }
+}
+
+@[inline]
+pub fn (user User) get_theme() string {
+	return user.theme or { '' }
 }

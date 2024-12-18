@@ -1,10 +1,12 @@
 module main
 
-import auth
+import veb
 import db.pg
+import auth
 import entity { User, Post, Like, LikeCache }
 
 pub struct App {
+	veb.StaticHandler
 pub:
 	config Config
 pub mut:
@@ -76,6 +78,13 @@ pub fn (app &App) get_post_by_id(id int) ?Post {
 		return none
 	}
 	return posts[0]
+}
+
+pub fn (app &App) get_pinned_posts() []Post {
+	posts := sql app.db {
+		select from Post where pinned == true
+	} or { [] }
+	return posts
 }
 
 pub fn (app &App) whoami(mut ctx Context) ?User {

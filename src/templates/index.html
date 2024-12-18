@@ -7,10 +7,19 @@
 @end
 
 <div>
+	@if pinned_posts.len > 0
+	<h2>pinned posts:</h2>
+	<div>
+		@for post in pinned_posts
+		@include 'components/post_small.html'
+		@end
+	</div>
+	@end
+
 	<h2>recent posts:</h2>
 	<div>
 		@if recent_posts.len > 0
-		@for post in app.get_recent_posts()
+		@for post in recent_posts
 		@include 'components/post_small.html'
 		@end
 		@else

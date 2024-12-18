@@ -5,8 +5,9 @@ import entity { User, Post }
 
 fn (mut app App) index(mut ctx Context) veb.Result {
 	ctx.title = 'beep'
-	recent_posts := app.get_recent_posts()
 	user := app.whoami(mut ctx) or { User{} }
+	recent_posts := app.get_recent_posts()
+	pinned_posts := app.get_pinned_posts()
 	return $veb.html()
 }
 

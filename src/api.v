@@ -133,23 +133,22 @@ fn (mut app App) api_user_full_logout(mut ctx Context) veb.Result {
 }
 
 @['/api/user/set_nickname'; post]
-fn (mut app App) api_user_set_nickname(mut ctx Context) veb.Result {
-	mut nickname := ?string(ctx.form['nickname'] or { '' })
-	nickname = sanatize(nickname or { '' })
-	if (nickname or { '' }) == '' {
-		nickname = none
-	}
-
+fn (mut app App) api_user_set_nickname(mut ctx Context, nickname string) veb.Result {
 	user := app.whoami(mut ctx) or {
 		ctx.error('you are not logged in!')
 		return ctx.redirect('/login')
 	}
 
+	mut sanatized_nickname := ?string(sanatize(nickname).trim_space())
+	if sanatized_nickname or { '' } == '' {
+		sanatized_nickname = none
+	}
+
 	sql app.db {
-		update User set nickname = nickname where id == user.id
+		update User set nickname = sanatized_nickname where id == user.id
 	} or {
 		ctx.error('failed to change nickname')
-		eprintln('failed to update nickname for ${user} (${user.nickname} -> ${nickname})')
+		eprintln('failed to update nickname for ${user} (${user.nickname} -> ${sanatized_nickname})')
 		return ctx.redirect('/me')
 	}
 
@@ -177,6 +176,31 @@ fn (mut app App) api_user_set_muted(mut ctx Context, muted bool) veb.Result {
 		eprintln('insufficient perms to update mute status for ${user} (${user.muted} -> ${muted})')
 		return ctx.redirect('/user/${user.username}')
 	}
+}
+
+@['/api/user/set_theme'; post]
+fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	mut theme := ?string(none)
+	if url.trim_space() != '' {
+		theme = sanatize(url).trim_space()
+	}
+
+	println('set theme to: ${theme}')
+
+	sql app.db {
+		update User set theme = theme where id == user.id
+	} or {
+		ctx.error('failed to change theme')
+		eprintln('failed to update theme for ${user} (${user.theme} -> ${theme})')
+		return ctx.redirect('/me')
+	}
+
+	return ctx.redirect('/me')
 }
 
 ////// Posts //////

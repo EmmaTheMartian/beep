@@ -4,7 +4,8 @@ import emmathemartian.maple
 
 pub struct Config {
 pub mut:
-	dev_mode bool
+	dev_mode    bool
+	static_path string
 	http struct {
 	pub mut:
 		port int
@@ -41,6 +42,7 @@ pub fn load_config_from(file_path string) Config {
 	mut config := Config{}
 
 	config.dev_mode = loaded.get('dev_mode').to_bool()
+	config.static_path = loaded.get('static_path').to_str()
 
 	loaded_http := loaded.get('http')
 	config.http.port = loaded_http.get('port').to_int()
