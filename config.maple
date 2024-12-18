@@ -1,6 +1,10 @@
 dev_mode = false
-
 static_path = 'src/static'
+
+instance = {
+	name = 'beeper'
+	welcome = 'welcome to beep!'
+}
 
 http = {
 	port = 8008

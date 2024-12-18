@@ -4,7 +4,7 @@ import veb
 import entity { User, Post }
 
 fn (mut app App) index(mut ctx Context) veb.Result {
-	ctx.title = 'beep'
+	ctx.title = app.config.instance.name
 	user := app.whoami(mut ctx) or { User{} }
 	recent_posts := app.get_recent_posts()
 	pinned_posts := app.get_pinned_posts()
@@ -12,13 +12,13 @@ fn (mut app App) index(mut ctx Context) veb.Result {
 }
 
 fn (mut app App) login(mut ctx Context) veb.Result {
-	ctx.title = 'login to beep'
+	ctx.title = 'login to ${app.config.instance.name}'
 	user := app.whoami(mut ctx) or { User{} }
 	return $veb.html()
 }
 
 fn (mut app App) register(mut ctx Context) veb.Result {
-	ctx.title = 'register for beep'
+	ctx.title = 'register for ${app.config.instance.name}'
 	user := app.whoami(mut ctx) or { User{} }
 	return $veb.html()
 }
@@ -28,12 +28,12 @@ fn (mut app App) me(mut ctx Context) veb.Result {
 		ctx.error('not logged in')
 		return ctx.redirect('/login')
 	}
-	ctx.title = 'beep - ${user.get_name()}'
+	ctx.title = '${app.config.instance.name} - ${user.get_name()}'
 	return $veb.html()
 }
 
 fn (mut app App) admin(mut ctx Context) veb.Result {
-	ctx.title = 'beep dashboard'
+	ctx.title = '${app.config.instance.name} dashboard'
 	user := app.whoami(mut ctx) or { User{} }
 	return $veb.html()
 }
@@ -44,7 +44,7 @@ fn (mut app App) user(mut ctx Context, username string) veb.Result {
 		ctx.error('user not found')
 		return ctx.redirect('/')
 	}
-	ctx.title = 'beep - ${user.get_name()}'
+	ctx.title = '${app.config.instance.name} - ${user.get_name()}'
 	return $veb.html()
 }
 
@@ -54,7 +54,7 @@ fn (mut app App) post(mut ctx Context, post_id int) veb.Result {
 		ctx.error('no such post')
 		return ctx.redirect('/')
 	}
-	ctx.title = 'beep - ${post.title}'
+	ctx.title = '${app.config.instance.name} - ${post.title}'
 	user := app.whoami(mut ctx) or { User{} }
 	return $veb.html()
 }

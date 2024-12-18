@@ -6,6 +6,7 @@
 
 ## planing
 
+- [ ] site:message of the day (admins can add a welcome message displayed on index.html)
 - [ ] post:mentioning ('tagging') other users in posts
 - [ ] post:replies
 - [ ] post:tags ('hashtags')

@@ -1,6 +1,6 @@
 @include 'partial/header.html'
 
-<h1>welcome to beep</h1>
+<h1>@app.config.instance.welcome</h1>
 
 @if ctx.is_logged_in()
 <p>logged in as: @{user.get_name()}</p>

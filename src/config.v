@@ -6,6 +6,11 @@ pub struct Config {
 pub mut:
 	dev_mode    bool
 	static_path string
+	instance struct {
+	pub mut:
+		name    string
+		welcome string
+	}
 	http struct {
 	pub mut:
 		port int
@@ -55,6 +60,12 @@ pub fn load_config_from(file_path string) Config {
 
 	config.dev_mode = loaded.get('dev_mode').to_bool()
 	config.static_path = loaded.get('static_path').to_str()
+
+	loaded_instance := loaded.get('instance')
+	// yes i am still sanatizing these despite being configured exclusively
+	// by the instance owner. redundant? maybe.
+	config.instance.name = sanatize(loaded_instance.get('name').to_str())
+	config.instance.welcome = sanatize(loaded_instance.get('welcome').to_str())
 
 	loaded_http := loaded.get('http')
 	config.http.port = loaded_http.get('port').to_int()
