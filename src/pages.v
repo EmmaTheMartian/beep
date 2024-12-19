@@ -70,3 +70,21 @@ fn (mut app App) post(mut ctx Context, post_id int) veb.Result {
 	user := app.whoami(mut ctx) or { User{} }
 	return $veb.html()
 }
+
+@['/post/:post_id/edit']
+fn (mut app App) edit(mut ctx Context, post_id int) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	post := app.get_post_by_id(post_id) or {
+		ctx.error('no such post')
+		return ctx.redirect('/')
+	}
+	if post.author_id != user.id {
+		ctx.error('insufficient permissions')
+		return ctx.redirect('/post/${post_id}')
+	}
+	ctx.title = '${app.config.instance.name} - editing ${post.title}'
+	return $veb.html()
+}

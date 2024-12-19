@@ -1,0 +1,48 @@
+@include 'partial/header.html'
+
+<script src="/static/js/post.js"></script>
+<script src="/static/js/render_body.js"></script>
+
+<h1>edit post</h1>
+
+<div class="post post-full">
+	<form action="/api/post/edit" method="post">
+		<input
+			type="number"
+			name="id"
+			id="id"
+			placeholder="post id"
+			value="@post.id"
+			required
+			readonly
+			hidden
+			aria-hidden
+		>
+		<input
+			type="text"
+			name="title"
+			id="title"
+			minlength="@app.config.post.title_min_len"
+			maxlength="@app.config.post.title_max_len"
+			pattern="@app.config.post.title_pattern"
+			placeholder="title"
+			value="@post.title"
+			required
+		>
+		<br>
+		<textarea
+			name="body"
+			id="body"
+			minlength="@app.config.post.body_min_len"
+			maxlength="@app.config.post.body_max_len"
+			rows="10"
+			cols="30"
+			placeholder="body"
+			required
+		>@post.body</textarea>
+		<br>
+		<input type="submit" value="save">
+	</form>
+</div>
+
+@include 'partial/footer.html'

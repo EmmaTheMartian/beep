@@ -9,6 +9,10 @@
 	<p><em>likes: @{app.get_net_likes_for_post(post.id)}</em></p>
 	<p><em>posted at: @post.posted_at</em></p>
 
+	@if ctx.is_logged_in() && post.author_id == user.id
+	<p><a href="/post/@{post.id}/edit">edit post</a></p>
+	@end
+
 	@if ctx.is_logged_in()
 	<br>
 	<div>
@@ -29,13 +33,16 @@
 	</div>
 	@end
 
-	@if (ctx.is_logged_in() && user.admin) || (ctx.is_logged_in() && post.author_id == user.id)
-	<hr>
-	@if user.admin
-	<h4>admin powers:</h4>
-	@else if post.author_id == user.id
+	@if ctx.is_logged_in() && (post.author_id == user.id || user.admin)
+	<br>
+	<div>
+
+	@if post.author_id == user.id
 	<h4>manage post:</h4>
+	@else if user.admin
+	<h4>admin powers:</h4>
 	@end
+
 	<form action="/api/post/delete" method="post">
 		<input
 			type="number"
@@ -50,6 +57,8 @@
 		>
 		<input type="submit" value="delete">
 	</form>
+
+	</div>
 	@end
 </div>
 

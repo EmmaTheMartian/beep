@@ -490,6 +490,32 @@ fn (mut app App) api_post_get_title(mut ctx Context, id int) veb.Result {
 	return ctx.text(post.title)
 }
 
+@['/api/post/edit'; post]
+fn (mut app App) api_post_edit(mut ctx Context, id int, title string, body string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in!')
+		return ctx.redirect('/login')
+	}
+	post := app.get_post_by_id(id) or {
+		ctx.error('no such post')
+		return ctx.redirect('/')
+	}
+	if post.author_id != user.id {
+		ctx.error('insufficient permissions')
+		return ctx.redirect('/')
+	}
+
+	sql app.db {
+		update Post set body = body, title = title where id == id
+	} or {
+		eprintln('failed to update post')
+		ctx.error('failed to update post')
+		return ctx.redirect('/')
+	}
+
+	return ctx.redirect('/post/${id}')
+}
+
 ////// site //////
 
 @['/api/site/set_motd'; post]

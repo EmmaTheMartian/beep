@@ -61,12 +61,18 @@ pub fn (app &App) get_recent_posts() []Post {
 	return posts
 }
 
-// pub fn (app &App) get_popular_posts() []Post {
-// 	posts := sql app.db {
-// 		select from Post order by likes desc limit 10
-// 	} or { [] }
-// 	return posts
-// }
+pub fn (app &App) get_popular_posts() []Post {
+	cached_likes := sql app.db {
+		select from LikeCache order by likes desc limit 10
+	} or { [] }
+	posts := cached_likes.map(fn [app] (it LikeCache) Post {
+		return app.get_post_by_id(it.post_id) or {
+			eprintln('cached like ${it} does not have a post related to it (from get_popular_posts)')
+			return Post{}
+		}
+	}).filter(it.id != 0)
+	return posts
+}
 
 pub fn (app &App) get_posts_from_user(user_id int) []Post {
 	posts := sql app.db {
