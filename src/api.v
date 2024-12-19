@@ -154,22 +154,22 @@ fn (mut app App) api_user_set_nickname(mut ctx Context, nickname string) veb.Res
 		return ctx.redirect('/login')
 	}
 
-	mut sanatized_nickname := ?string(sanatize(nickname).trim_space())
-	if sanatized_nickname or { '' } == '' {
-		sanatized_nickname = none
+	mut clean_nickname := ?string(nickname.trim_space())
+	if clean_nickname or { '' } == '' {
+		clean_nickname = none
 	}
 
 	// validate
-	if sanatized_nickname != none && !app.validators.nickname.validate(sanatized_nickname or { '' }) {
+	if clean_nickname != none && !app.validators.nickname.validate(clean_nickname or { '' }) {
 		ctx.error('invalid nickname')
 		return ctx.redirect('/me')
 	}
 
 	sql app.db {
-		update User set nickname = sanatized_nickname where id == user.id
+		update User set nickname = clean_nickname where id == user.id
 	} or {
 		ctx.error('failed to change nickname')
-		eprintln('failed to update nickname for ${user} (${user.nickname} -> ${sanatized_nickname})')
+		eprintln('failed to update nickname for ${user} (${user.nickname} -> ${clean_nickname})')
 		return ctx.redirect('/me')
 	}
 
@@ -213,7 +213,7 @@ fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
 
 	mut theme := ?string(none)
 	if url.trim_space() != '' {
-		theme = sanatize(url).trim_space()
+		theme = url.trim_space()
 	}
 
 	sql app.db {
@@ -234,7 +234,7 @@ fn (mut app App) api_user_set_pronouns(mut ctx Context, pronouns string) veb.Res
 		return ctx.redirect('/login')
 	}
 
-	clean_pronouns := sanatize(pronouns).trim_space()
+	clean_pronouns := pronouns.trim_space()
 	if !app.validators.pronouns.validate(clean_pronouns) {
 		ctx.error('invalid pronouns')
 		return ctx.redirect('/me')
@@ -258,7 +258,7 @@ fn (mut app App) api_user_set_bio(mut ctx Context, bio string) veb.Result {
 		return ctx.redirect('/login')
 	}
 
-	clean_bio := sanatize(bio).trim_space()
+	clean_bio := bio.trim_space()
 	if !app.validators.user_bio.validate(clean_bio) {
 		ctx.error('invalid bio')
 		return ctx.redirect('/me')
@@ -311,8 +311,8 @@ fn (mut app App) api_post_new_post(mut ctx Context, title string, body string) v
 
 	post := Post{
 		author_id: user.id
-		title: sanatize(title)
-		body: sanatize(body)
+		title: title
+		body: body
 	}
 
 	sql app.db {

@@ -62,10 +62,8 @@ pub fn load_config_from(file_path string) Config {
 	config.static_path = loaded.get('static_path').to_str()
 
 	loaded_instance := loaded.get('instance')
-	// yes i am still sanatizing these despite being configured exclusively
-	// by the instance owner. redundant? maybe.
-	config.instance.name = sanatize(loaded_instance.get('name').to_str())
-	config.instance.welcome = sanatize(loaded_instance.get('welcome').to_str())
+	config.instance.name = loaded_instance.get('name').to_str()
+	config.instance.welcome = loaded_instance.get('welcome').to_str()
 
 	loaded_http := loaded.get('http')
 	config.http.port = loaded_http.get('port').to_int()
