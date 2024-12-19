@@ -60,3 +60,23 @@ spec for beep:
 | `id`      | int  | identifier for this entry             |
 | `post_id` | int  | the post this entry is for            |
 | `likes`   | int  | the net amount of likes this post has |
+
+## `Site`
+
+> stores mutable, site-wide data. there should only ever be one entry here
+
+| name   | type   | desc                                         |
+|--------|--------|----------------------------------------------|
+| `id`   | int    | identifier for this (should always be 0)     |
+| `motd` | string | the message of the day displayed on `/index` |
+
+## `Notification`
+
+> represents a notification sent to a user
+
+| name      | type   | desc                                     |
+|-----------|--------|------------------------------------------|
+| `id`      | int    | identifier for this notification         |
+| `user_id` | int    | the user that receives this notification |
+| `summary` | string | the summary for this notification        |
+| `body`    | string | the full text for this notification      |

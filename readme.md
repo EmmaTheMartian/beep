@@ -28,3 +28,8 @@ v -prod .
 ```
 
 then go to the configured url to view (default is `http://localhost:8008`).
+
+if you do not have a database, you can either self-host a postgresql database on
+your machine, or you can find a free one online. i use and like
+[neon.tech](https://neon.tech), their free plan is pretty comfortable for a
+small beep instance!

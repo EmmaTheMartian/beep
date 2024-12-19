@@ -318,6 +318,67 @@ fn (mut app App) api_user_notification_clear_all(mut ctx Context) veb.Result {
 	return ctx.redirect('/inbox')
 }
 
+@['/api/user/delete']
+fn (mut app App) api_user_delete(mut ctx Context, id int) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	println('attempting to delete ${id} as ${user.id}')
+
+	if user.admin || user.id == id {
+		// yeet
+		sql app.db {
+			delete from User where id == id
+			delete from Like where user_id == id
+			delete from Notification where user_id == id
+		} or {
+			ctx.error('failed to delete user: ${id}')
+			return ctx.redirect('/')
+		}
+
+		// delete posts and their likes
+		posts_from_this_user := sql app.db {
+			select from Post where author_id == id
+		} or { [] }
+
+		for post in posts_from_this_user {
+			sql app.db {
+				delete from Like where post_id == post.id
+				delete from LikeCache where post_id == post.id
+			} or {
+				eprintln('failed to delete like cache for post during user deletion: ${post.id}')
+			}
+		}
+
+		sql app.db {
+			delete from Post where author_id == id
+		} or {
+			eprintln('failed to delete posts by deleting user: ${user.id}')
+		}
+
+		app.auth.delete_tokens_for_user(id) or {
+			eprintln('failed to delete tokens for user during deletion: ${id}')
+		}
+		// log out
+		if user.id == id {
+			ctx.set_cookie(
+				name:      'token'
+				value:     ''
+				same_site: .same_site_none_mode
+				secure:    true
+				path:      '/'
+			)
+		}
+		println('deleted user ${id}')
+	} else {
+		ctx.error('be nice. deleting other users is off-limits.')
+	}
+
+	return ctx.redirect('/')
+}
+
 ////// post //////
 
 @['/api/post/new_post'; post]

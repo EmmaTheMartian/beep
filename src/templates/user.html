@@ -132,6 +132,42 @@
 		<input type="submit" value="save">
 	</form>
 	@end
+	<br>
+	<details>
+		<summary>dangerous settings (click to reveal)</summary>
+		<div>
+			<form action="/api/user/delete" autocomplete="off">
+				<input
+					type="number"
+					name="id"
+					id="id"
+					value="@user.id"
+					required
+					readonly
+					hidden
+					aria-hidden
+				>
+				<p><strong>there is NO GOING BACK after deleting your account.</strong></p>
+				<p><strong>EVERY ONE of your posts, notifications, likes, dislikes, and ALL OTHER USER DATA WILL BE PERMANENTLY DELETED</strong></p>
+				<div>
+					<input type="checkbox" name="are-you-sure" id="are-you-sure" required>
+					<label for="are-you-sure">click to confirm</label>
+				</div>
+				<br>
+				<div>
+					<input type="checkbox" name="are-you-really-sure" id="are-you-really-sure" required>
+					<label for="are-you-really-sure">click to doubly confirm</label>
+				</div>
+				<br>
+				<div>
+					<input type="checkbox" name="are-you-absolutely-sure" id="are-you-absolutely-sure" required>
+					<label for="are-you-absolutely-sure">click to triply confirm</label>
+				</div>
+				<br>
+				<input type="submit" value="delete your account">
+			</form>
+		</div>
+	</details>
 </div>
 @end
 
@@ -140,7 +176,7 @@
 	<h2>admin powers:</h2>
 	<form action="/api/user/set_muted" method="post">
 		<input
-			type="text"
+			type="number"
 			name="id"
 			id="id"
 			value="@user.id"
