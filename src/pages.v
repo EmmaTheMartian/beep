@@ -1,7 +1,7 @@
 module main
 
 import veb
-import entity { User, Post }
+import entity { User }
 
 fn (mut app App) index(mut ctx Context) veb.Result {
 	ctx.title = app.config.instance.name

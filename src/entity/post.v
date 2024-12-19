@@ -7,8 +7,8 @@ pub mut:
 	id        int @[primary; sql: serial]
 	author_id int
 
-	title  string
-	body   string
+	title string
+	body  string
 
 	pinned bool
 

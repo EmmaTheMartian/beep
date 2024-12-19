@@ -33,18 +33,19 @@ fn main() {
 
 	mut app := &App{
 		config: config
-		db: db
-		auth: auth.new(db)
-		validators: struct {
-			username:   StringValidator.new(config.user.username_min_len, config.user.username_max_len, config.user.username_pattern)
-			password:   StringValidator.new(config.user.username_min_len, config.user.username_max_len, config.user.username_pattern)
-			nickname:   StringValidator.new(config.user.nickname_min_len, config.user.nickname_max_len, config.user.nickname_pattern)
-			user_bio:   StringValidator.new(config.user.bio_min_len, config.user.bio_max_len, config.user.bio_pattern)
-			pronouns:   StringValidator.new(config.user.pronouns_min_len, config.user.pronouns_max_len, config.user.pronouns_pattern)
-			post_title: StringValidator.new(config.post.title_min_len, config.post.title_max_len, config.post.title_pattern)
-			post_body:  StringValidator.new(config.post.body_min_len, config.post.body_max_len, config.post.body_pattern)
-		}
+		db:     db
+		auth:   auth.new(db)
 	}
+
+	// vfmt off
+	app.validators.username = StringValidator.new(config.user.username_min_len, config.user.username_max_len, config.user.username_pattern)
+	app.validators.password = StringValidator.new(config.user.username_min_len, config.user.username_max_len, config.user.username_pattern)
+	app.validators.nickname = StringValidator.new(config.user.nickname_min_len, config.user.nickname_max_len, config.user.nickname_pattern)
+	app.validators.user_bio = StringValidator.new(config.user.bio_min_len, config.user.bio_max_len, config.user.bio_pattern)
+	app.validators.pronouns = StringValidator.new(config.user.pronouns_min_len, config.user.pronouns_max_len, config.user.pronouns_pattern)
+	app.validators.post_title = StringValidator.new(config.post.title_min_len, config.post.title_max_len, config.post.title_pattern)
+	app.validators.post_body = StringValidator.new(config.post.body_min_len, config.post.body_max_len, config.post.body_pattern)
+	// vfmt on
 
 	app.mount_static_folder_at(app.config.static_path, '/static')!
 	init_db(db)!

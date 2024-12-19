@@ -2,7 +2,7 @@ module main
 
 import veb
 import auth
-import entity { Site, User, Post, Like, LikeCache }
+import entity { Like, LikeCache, Post, Site, User }
 
 ////// Users //////
 
@@ -27,8 +27,8 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 
 	salt := auth.generate_salt()
 	mut user := User{
-		username: username
-		password: auth.hash_password_with_salt(password, salt)
+		username:      username
+		password:      auth.hash_password_with_salt(password, salt)
 		password_salt: salt
 	}
 
@@ -277,9 +277,7 @@ fn (mut app App) api_user_set_bio(mut ctx Context, bio string) veb.Result {
 
 @['/api/user/get_name']
 fn (mut app App) api_user_get_name(mut ctx Context, username string) veb.Result {
-	user := app.get_user_by_name(username) or {
-		return ctx.server_error('no such user')
-	}
+	user := app.get_user_by_name(username) or { return ctx.server_error('no such user') }
 	return ctx.text(user.get_name())
 }
 
@@ -311,8 +309,8 @@ fn (mut app App) api_post_new_post(mut ctx Context, title string, body string) v
 
 	post := Post{
 		author_id: user.id
-		title: title
-		body: body
+		title:     title
+		body:      body
 	}
 
 	sql app.db {
@@ -358,13 +356,9 @@ fn (mut app App) api_post_delete(mut ctx Context, id int) veb.Result {
 
 @['/api/post/like']
 fn (mut app App) api_post_like(mut ctx Context, id int) veb.Result {
-	user := app.whoami(mut ctx) or {
-		return ctx.unauthorized('not logged in')
-	}
+	user := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
 
-	post := app.get_post_by_id(id) or {
-		return ctx.server_error('post does not exist')
-	}
+	post := app.get_post_by_id(id) or { return ctx.server_error('post does not exist') }
 
 	if app.does_user_like_post(user.id, post.id) {
 		sql app.db {
@@ -405,13 +399,9 @@ fn (mut app App) api_post_like(mut ctx Context, id int) veb.Result {
 
 @['/api/post/dislike']
 fn (mut app App) api_post_dislike(mut ctx Context, id int) veb.Result {
-	user := app.whoami(mut ctx) or {
-		return ctx.unauthorized('not logged in')
-	}
+	user := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
 
-	post := app.get_post_by_id(id) or {
-		return ctx.server_error('post does not exist')
-	}
+	post := app.get_post_by_id(id) or { return ctx.server_error('post does not exist') }
 
 	if app.does_user_dislike_post(user.id, post.id) {
 		sql app.db {

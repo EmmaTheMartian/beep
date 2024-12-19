@@ -12,7 +12,8 @@ pub:
 
 @[inline]
 pub fn (validator StringValidator) validate(str string) bool {
-	return str.len > validator.min_len && str.len < validator.max_len && validator.pattern.matches_string(str)
+	return str.len > validator.min_len && str.len < validator.max_len
+		&& validator.pattern.matches_string(str)
 }
 
 pub fn StringValidator.new(min int, max int, pattern string) StringValidator {

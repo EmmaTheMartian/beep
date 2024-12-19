@@ -12,7 +12,7 @@ pub mut:
 // Stores total likes per post
 pub struct LikeCache {
 pub mut:
-	id       int @[primary; sql: serial]
-	post_id  int
-	likes    int
+	id      int @[primary; sql: serial]
+	post_id int
+	likes   int
 }

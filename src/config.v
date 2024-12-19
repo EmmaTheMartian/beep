@@ -6,35 +6,35 @@ pub struct Config {
 pub mut:
 	dev_mode    bool
 	static_path string
-	instance struct {
+	instance    struct {
 	pub mut:
 		name                 string
 		welcome              string
 		default_theme        string
 		allow_changing_theme bool
 	}
-	http struct {
+	http        struct {
 	pub mut:
 		port int
 	}
-	postgres struct {
+	postgres    struct {
 	pub mut:
-		host string
-		port int
-		user string
+		host     string
+		port     int
+		user     string
 		password string
-		db string
+		db       string
 	}
-	post struct {
+	post        struct {
 	pub mut:
 		title_min_len int
 		title_max_len int
 		title_pattern string
-		body_min_len int
-		body_max_len int
-		body_pattern string
+		body_min_len  int
+		body_max_len  int
+		body_pattern  string
 	}
-	user struct {
+	user        struct {
 	pub mut:
 		username_min_len int
 		username_max_len int

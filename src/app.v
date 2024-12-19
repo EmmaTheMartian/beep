@@ -3,7 +3,7 @@ module main
 import veb
 import db.pg
 import auth
-import entity { Site, User, Post, Like, LikeCache }
+import entity { LikeCache, Like, Post, Site, User }
 
 pub struct App {
 	veb.StaticHandler
@@ -13,7 +13,7 @@ pub mut:
 	db         pg.DB
 	auth       auth.Auth[pg.DB]
 	validators struct {
-	pub:
+	pub mut:
 		username   StringValidator
 		password   StringValidator
 		nickname   StringValidator
@@ -98,9 +98,7 @@ pub fn (app &App) get_pinned_posts() []Post {
 }
 
 pub fn (app &App) whoami(mut ctx Context) ?User {
-	token := ctx.get_cookie('token') or {
-		return none
-	}.trim_space()
+	token := ctx.get_cookie('token') or { return none }.trim_space()
 	if token == '' {
 		return none
 	}
@@ -133,7 +131,9 @@ pub fn (app &App) whoami(mut ctx Context) ?User {
 }
 
 pub fn (app &App) get_unknown_user() User {
-	return User{ username: 'unknown' }
+	return User{
+		username: 'unknown'
+	}
 }
 
 pub fn (app &App) logged_in_as(mut ctx Context, id int) bool {
@@ -204,9 +204,9 @@ pub fn (app &App) get_net_likes_for_post(post_id int) int {
 		}
 
 		// cache
-		cached := LikeCache {
+		cached := LikeCache{
 			post_id: post_id
-			likes: likes
+			likes:   likes
 		}
 		sql app.db {
 			insert cached into LikeCache
@@ -223,16 +223,14 @@ pub fn (app &App) get_net_likes_for_post(post_id int) int {
 
 pub fn (app &App) get_or_create_site_config() Site {
 	configs := sql app.db {
-		select from entity.Site
+		select from Site
 	} or { [] }
 	if configs.len == 0 {
 		// make the site config
-		site_config := entity.Site{ }
+		site_config := Site{}
 		sql app.db {
-			insert site_config into entity.Site
-		} or {
-			panic('failed to create site config (${err})')
-		}
+			insert site_config into Site
+		} or { panic('failed to create site config (${err})') }
 	} else if configs.len > 1 {
 		// this should never happen
 		panic('there are multiple site configs')
