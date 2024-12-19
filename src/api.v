@@ -275,6 +275,14 @@ fn (mut app App) api_user_set_bio(mut ctx Context, bio string) veb.Result {
 	return ctx.redirect('/me')
 }
 
+@['/api/user/get_name']
+fn (mut app App) api_user_get_name(mut ctx Context, username string) veb.Result {
+	user := app.get_user_by_name(username) or {
+		return ctx.server_error('no such user')
+	}
+	return ctx.text(user.get_name())
+}
+
 ////// Posts //////
 
 @['/api/post/new_post'; post]

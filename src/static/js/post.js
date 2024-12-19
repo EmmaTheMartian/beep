@@ -17,8 +17,8 @@ const render_post_body = async (id, mention_pattern) => {
 	var body = element.innerText
 	const matches = body.matchAll(new RegExp(mention_pattern, 'g'))
 	for (const match of matches) {
-		console.log('found match: ' + match)
-		const username = match[0].substring(1)
-		element.innerHTML = element.innerHTML.replaceAll(username, '<a href="/user/' + username + '">' + username + '</a>')
+		(await fetch('/api/user/get_name?username=' + match[0].substring(2, match[0].length - 1))).text().then(s => {
+			element.innerHTML = element.innerHTML.replace(match[0], '<a href="/user/' + match[0].substring(2, match[0].length - 1) + '">' + s + '</a>')
+		})
 	}
 }
