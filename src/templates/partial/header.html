@@ -10,6 +10,8 @@
 	@include 'assets/style.html'
 	@if ctx.is_logged_in() && user.theme != none
 	<link rel="stylesheet" href="@user.get_theme()">
+	@else if app.config.instance.default_theme != ''
+	<link rel="stylesheet" href="@app.config.instance.default_theme">
 	@endif
 </head>
 

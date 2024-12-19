@@ -124,7 +124,7 @@
 	<form action="/api/user/set_nickname" method="post">
 		<input type="submit" value="reset nickname">
 	</form>
-	@if app.config.user.allow_changing_theme
+	@if app.config.instance.allow_changing_theme
 	<br>
 	<form action="/api/user/set_theme" method="post">
 		<label for="url">theme:</label>

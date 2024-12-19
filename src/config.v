@@ -8,8 +8,10 @@ pub mut:
 	static_path string
 	instance struct {
 	pub mut:
-		name    string
-		welcome string
+		name                 string
+		welcome              string
+		default_theme        string
+		allow_changing_theme bool
 	}
 	http struct {
 	pub mut:
@@ -34,23 +36,21 @@ pub mut:
 	}
 	user struct {
 	pub mut:
-		username_min_len     int
-		username_max_len     int
-		username_pattern     string
-		nickname_min_len     int
-		nickname_max_len     int
-		nickname_pattern     string
-		password_min_len     int
-		password_max_len     int
-		password_pattern     string
-		pronouns_min_len     int
-		pronouns_max_len     int
-		pronouns_pattern     string
-		bio_min_len          int
-		bio_max_len          int
-		bio_pattern          string
-		default_theme        string
-		allow_changing_theme bool
+		username_min_len int
+		username_max_len int
+		username_pattern string
+		nickname_min_len int
+		nickname_max_len int
+		nickname_pattern string
+		password_min_len int
+		password_max_len int
+		password_pattern string
+		pronouns_min_len int
+		pronouns_max_len int
+		pronouns_pattern string
+		bio_min_len      int
+		bio_max_len      int
+		bio_pattern      string
 	}
 }
 
@@ -64,6 +64,8 @@ pub fn load_config_from(file_path string) Config {
 	loaded_instance := loaded.get('instance')
 	config.instance.name = loaded_instance.get('name').to_str()
 	config.instance.welcome = loaded_instance.get('welcome').to_str()
+	config.instance.default_theme = loaded_instance.get('default_theme').to_str()
+	config.instance.allow_changing_theme = loaded_instance.get('allow_changing_theme').to_bool()
 
 	loaded_http := loaded.get('http')
 	config.http.port = loaded_http.get('port').to_int()
@@ -99,8 +101,6 @@ pub fn load_config_from(file_path string) Config {
 	config.user.bio_min_len = loaded_user.get('bio_min_len').to_int()
 	config.user.bio_max_len = loaded_user.get('bio_max_len').to_int()
 	config.user.bio_pattern = loaded_user.get('bio_pattern').to_str()
-	config.user.default_theme = loaded_user.get('default_theme').to_str()
-	config.user.allow_changing_theme = loaded_user.get('allow_changing_theme').to_bool()
 
 	return config
 }

@@ -32,8 +32,8 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 		password_salt: salt
 	}
 
-	if app.config.user.default_theme != '' {
-		user.theme = app.config.user.default_theme
+	if app.config.instance.default_theme != '' {
+		user.theme = app.config.instance.default_theme
 	}
 
 	sql app.db {
@@ -201,7 +201,7 @@ fn (mut app App) api_user_set_muted(mut ctx Context, muted bool) veb.Result {
 
 @['/api/user/set_theme'; post]
 fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
-	if !app.config.user.allow_changing_theme {
+	if !app.config.instance.allow_changing_theme {
 		ctx.error('this instance disallows changing themes :(')
 		return ctx.redirect('/me')
 	}
