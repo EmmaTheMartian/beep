@@ -325,7 +325,12 @@ fn (mut app App) api_post_delete(mut ctx Context, id int) veb.Result {
 		return ctx.redirect('/login')
 	}
 
-	if user.admin || app.config.dev_mode {
+	post := app.get_post_by_id(id) or {
+		ctx.error('post does not exist')
+		return ctx.redirect('/')
+	}
+
+	if user.admin || user.id == post.author_id {
 		sql app.db {
 			delete from Post where id == id
 			delete from Like where post_id == id

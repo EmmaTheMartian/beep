@@ -30,7 +30,7 @@ fn (mut app App) me(mut ctx Context) veb.Result {
 		return ctx.redirect('/login')
 	}
 	ctx.title = '${app.config.instance.name} - ${user.get_name()}'
-	return $veb.html()
+	return ctx.redirect('/user/${user.username}')
 }
 
 fn (mut app App) admin(mut ctx Context) veb.Result {
@@ -41,7 +41,8 @@ fn (mut app App) admin(mut ctx Context) veb.Result {
 
 @['/user/:username']
 fn (mut app App) user(mut ctx Context, username string) veb.Result {
-	user := app.get_user_by_name(username) or {
+	user := app.whoami(mut ctx) or { User{} }
+	viewing := app.get_user_by_name(username) or {
 		ctx.error('user not found')
 		return ctx.redirect('/')
 	}

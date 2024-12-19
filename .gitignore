@@ -22,7 +22,6 @@ bin/
 
 # vweb and database
 *.db
-*.js
 
 # Local V install
 /v/

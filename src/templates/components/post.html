@@ -1,28 +1,11 @@
-<div class="post post-full">
+<div class="post post-full" onload="render_post_body(@{post.id}, '@@@{app.config.user.username_pattern}')">
 	<h2><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</h2>
-	<pre>@post.body</pre>
+	<pre id="post-@{post.id}">@post.body</pre>
 	<p><em>likes: @{app.get_net_likes_for_post(post.id)}</em></p>
 	<p><em>posted at: @post.posted_at</em></p>
 
 	@if ctx.is_logged_in()
-	<script>
-		const like = async (id) => {
-			await fetch('/api/post/like?id=' + id, {
-				method: 'GET'
-			})
-			window.location.reload()
-		}
-
-		const dislike = async (id) => {
-			await fetch('/api/post/dislike?id=' + id, {
-				method: 'GET'
-			})
-			window.location.reload()
-		}
-	</script>
-
 	<br>
-
 	<div>
 		<button onclick="like(@post.id)">
 			@if app.does_user_like_post(user.id, post.id)
@@ -41,9 +24,13 @@
 	</div>
 	@end
 
-	@if app.config.dev_mode || (ctx.is_logged_in() && user.admin) || (ctx.is_logged_in() && post.author_id == user.id)
+	@if (ctx.is_logged_in() && user.admin) || (ctx.is_logged_in() && post.author_id == user.id)
 	<hr>
+	@if user.admin
 	<h4>admin powers:</h4>
+	@else if post.author_id == user.id
+	<h4>manage post:</h4>
+	@end
 	<form action="/api/post/delete" method="post">
 		<input
 			type="number"
