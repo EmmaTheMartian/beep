@@ -39,6 +39,16 @@ fn (mut app App) admin(mut ctx Context) veb.Result {
 	return $veb.html()
 }
 
+fn (mut app App) inbox(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} inbox'
+	notifications := app.get_notifications_for(user.id)
+	return $veb.html()
+}
+
 @['/user/:username']
 fn (mut app App) user(mut ctx Context, username string) veb.Result {
 	user := app.whoami(mut ctx) or { User{} }

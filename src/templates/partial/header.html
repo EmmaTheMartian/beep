@@ -34,6 +34,8 @@
 		@if ctx.is_logged_in()
 		<a href="/me">profile</a>
 		-
+		<a href="/inbox">inbox@{app.get_notification_count_for_frontend(user.id, 99)}</a>
+		-
 		<a href="/api/user/logout">log out</a>
 		@else
 		<a href="/login">log in</a>

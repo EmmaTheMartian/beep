@@ -52,6 +52,11 @@ pub mut:
 		bio_max_len      int
 		bio_pattern      string
 	}
+	welcome struct {
+	pub mut:
+		summary string
+		body    string
+	}
 }
 
 pub fn load_config_from(file_path string) Config {
@@ -101,6 +106,10 @@ pub fn load_config_from(file_path string) Config {
 	config.user.bio_min_len = loaded_user.get('bio_min_len').to_int()
 	config.user.bio_max_len = loaded_user.get('bio_max_len').to_int()
 	config.user.bio_pattern = loaded_user.get('bio_pattern').to_str()
+
+	loaded_welcome := loaded.get('welcome')
+	config.welcome.summary = loaded_welcome.get('summary').to_str()
+	config.welcome.body = loaded_welcome.get('body').to_str()
 
 	return config
 }

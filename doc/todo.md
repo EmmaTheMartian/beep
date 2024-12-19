@@ -4,8 +4,6 @@
 
 ## in-progress
 
-- [ ] post:mentioning ('tagging') other users in posts
-
 ## planing
 
 - [ ] post:replies
@@ -24,7 +22,10 @@
 - [x] user:nicknames
 - [x] user:bio/about me
 - [x] user:listed pronouns
+- [x] user:notifications
 - [x] post:likes/dislikes
+- [x] post:mentioning ('tagging') other users in posts
+	- [x] post:mentioning:who mentioned you (send notifications when a user mentions you)
 - [ ] ~~site:stylesheet (and a toggle for html-only mode)~~
 	- replaced with per-user optional stylesheets
 - [x] site:message of the day (admins can add a welcome message displayed on index.html)

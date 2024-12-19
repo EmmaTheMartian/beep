@@ -1,13 +1,16 @@
-.post {
+.post,
+.notification {
 	border: 2px solid;
 	padding: 8px;
 }
 
-.post p {
+.post p,
+.notification p {
 	margin: 0;
 }
 
-.post + .post {
+.post + .post,
+.notification + .notification {
 	margin-top: 6px;
 }
 

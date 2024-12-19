@@ -13,12 +13,14 @@ fn init_db(db pg.DB) ! {
 		create table entity.Post
 		create table entity.Like
 		create table entity.LikeCache
+		create table entity.Notification
 	}!
 }
 
 fn main() {
 	config := load_config_from(os.args[1])
 
+	println('-> connecting to db...')
 	mut db := pg.connect(pg.Config{
 		host:     config.postgres.host
 		dbname:   config.postgres.db
@@ -26,6 +28,7 @@ fn main() {
 		password: config.postgres.password
 		port:     config.postgres.port
 	})!
+	println('<- connected')
 
 	defer {
 		db.close()
@@ -48,7 +51,10 @@ fn main() {
 	// vfmt on
 
 	app.mount_static_folder_at(app.config.static_path, '/static')!
+
+	println('-> initializing database...')
 	init_db(db)!
+	println('<- done')
 
 	// make the website config, if it does not exist
 	app.get_or_create_site_config()

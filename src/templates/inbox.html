@@ -1,0 +1,30 @@
+@include 'partial/header.html'
+
+@if ctx.is_logged_in()
+<script src="/static/js/render_body.js"></script>
+
+<h1>inbox</h1>
+
+<div>
+	@if notifications.len == 0
+	<p>your inbox is empty!</p>
+	@else
+	<a href="/api/user/notification/clear_all">clear all</a>
+	<hr>
+	@for notification in notifications.reverse()
+	<div class="notification">
+		<p><strong>@notification.summary</strong></p>
+		<pre id="notif-@{notification.id}">@notification.body</pre>
+		<a href="/api/user/notification/clear?id=@{notification.id}">clear</a>
+		<script>
+			render_body('notif-@{notification.id}')
+		</script>
+	</div>
+	@end
+	@end
+</div>
+@else
+<p>uh oh, you need to be logged in to view this page</p>
+@end
+
+@include 'partial/footer.html'

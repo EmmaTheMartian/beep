@@ -1,6 +1,7 @@
 @include 'partial/header.html'
 
 <script src="/static/js/post.js"></script>
+<script src="/static/js/render_body.js"></script>
 
 <div class="post post-full">
 	<h2><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</h2>
@@ -53,7 +54,7 @@
 </div>
 
 <script type="module">
-	await render_post_body(@{post.id}, '@@\\(@{app.config.user.username_pattern}\\)')
+	await render_body('post-@{post.id}')
 </script>
 
 @include 'partial/footer.html'

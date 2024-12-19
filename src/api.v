@@ -2,9 +2,9 @@ module main
 
 import veb
 import auth
-import entity { Like, LikeCache, Post, Site, User }
+import entity { Like, LikeCache, Post, Site, User, Notification }
 
-////// Users //////
+////// user //////
 
 @['/api/user/register'; post]
 fn (mut app App) api_user_register(mut ctx Context, username string, password string) veb.Result {
@@ -46,9 +46,14 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 	println('reg: ${username}')
 
 	if x := app.get_user_by_name(username) {
+		app.send_notification_to(
+			x.id,
+			app.config.welcome.summary.replace('%s', x.get_name()),
+			app.config.welcome.body.replace('%s', x.get_name())
+		)
 		token := app.auth.add_token(x.id, ctx.ip()) or {
 			eprintln(err)
-			ctx.error('could not create token for user with id ${user.id}')
+			ctx.error('could not create token for user with id ${x.id}')
 			return ctx.redirect('/')
 		}
 		ctx.set_cookie(
@@ -281,7 +286,39 @@ fn (mut app App) api_user_get_name(mut ctx Context, username string) veb.Result 
 	return ctx.text(user.get_name())
 }
 
-////// Posts //////
+/// user/notification ///
+
+@['/api/user/notification/clear']
+fn (mut app App) api_user_notification_clear(mut ctx Context, id int) veb.Result {
+	if !ctx.is_logged_in() {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+	sql app.db {
+		delete from Notification where id == id
+	} or {
+		ctx.error('failed to delete notification')
+		return ctx.redirect('/inbox')
+	}
+	return ctx.redirect('/inbox')
+}
+
+@['/api/user/notification/clear_all']
+fn (mut app App) api_user_notification_clear_all(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+	sql app.db {
+		delete from Notification where user_id == user.id
+	} or {
+		ctx.error('failed to delete notifications')
+		return ctx.redirect('/inbox')
+	}
+	return ctx.redirect('/inbox')
+}
+
+////// post //////
 
 @['/api/post/new_post'; post]
 fn (mut app App) api_post_new_post(mut ctx Context, title string, body string) veb.Result {
@@ -319,6 +356,13 @@ fn (mut app App) api_post_new_post(mut ctx Context, title string, body string) v
 		ctx.error('failed to post!')
 		println('failed to post: ${post} from user ${user.id}')
 		return ctx.redirect('/me')
+	}
+
+	// find the post's id to process mentions with
+	if x := app.get_post_by_author_and_timestamp(user.id, post.posted_at) {
+		app.process_post_mentions(x)
+	} else {
+		ctx.error('failed to get_post_by_timestamp_and_author for ${post}')
 	}
 
 	return ctx.redirect('/me')
@@ -440,7 +484,13 @@ fn (mut app App) api_post_dislike(mut ctx Context, id int) veb.Result {
 	}
 }
 
-////// Site //////
+@['/api/post/get_title']
+fn (mut app App) api_post_get_title(mut ctx Context, id int) veb.Result {
+	post := app.get_post_by_id(id) or { return ctx.server_error('no such post') }
+	return ctx.text(post.title)
+}
+
+////// site //////
 
 @['/api/site/set_motd'; post]
 fn (mut app App) api_site_set_motd(mut ctx Context, motd string) veb.Result {

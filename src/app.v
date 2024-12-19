@@ -2,8 +2,10 @@ module main
 
 import veb
 import db.pg
+import regex
+import time
 import auth
-import entity { LikeCache, Like, Post, Site, User }
+import entity { LikeCache, Like, Post, Site, User, Notification }
 
 pub struct App {
 	veb.StaticHandler
@@ -85,6 +87,16 @@ pub fn (app &App) get_post_by_id(id int) ?Post {
 		select from Post where id == id limit 1
 	} or { [] }
 	if posts.len != 1 {
+		return none
+	}
+	return posts[0]
+}
+
+pub fn (app &App) get_post_by_author_and_timestamp(author_id int, timestamp time.Time) ?Post {
+	posts := sql app.db {
+		select from Post where author_id == author_id && posted_at == timestamp order by posted_at desc limit 1
+	} or { [] }
+	if posts.len == 0 {
 		return none
 	}
 	return posts[0]
@@ -238,7 +250,80 @@ pub fn (app &App) get_or_create_site_config() Site {
 	return configs[0]
 }
 
+@[inline]
 pub fn (app &App) get_motd() string {
 	site := app.get_or_create_site_config()
 	return site.motd
+}
+
+pub fn (app &App) get_notifications_for(user_id int) []Notification {
+	notifications := sql app.db {
+		select from Notification where user_id == user_id
+	} or { [] }
+	return notifications
+}
+
+pub fn (app &App) get_notification_count(user_id int, limit int) int {
+	notifications := sql app.db {
+		select from Notification where user_id == user_id limit limit
+	} or { [] }
+	return notifications.len
+}
+
+pub fn (app &App) get_notification_count_for_frontend(user_id int, limit int) string {
+	count := app.get_notification_count(user_id, limit)
+	if count == 0 {
+		return ''
+	} else if count > limit {
+		return ' (${count}+)'
+	} else {
+		return ' (${count})'
+	}
+}
+
+pub fn (app &App) send_notification_to(user_id int, summary string, body string) {
+	notification := Notification{
+		user_id: user_id
+		summary: summary
+		body: body
+	}
+	sql app.db {
+		insert notification into Notification
+	} or {
+		eprintln('failed to send notification ${notification}')
+	}
+}
+
+// sends notifications to each user mentioned in a post
+pub fn (app &App) process_post_mentions(post &Post) {
+	author := app.get_user_by_id(post.author_id) or {
+		eprintln('process_post_mentioned called on a post with a non-existent author: ${post}')
+		return
+	}
+	author_name := author.get_name()
+
+	mut re := regex.regex_opt('@\\(${app.config.user.username_pattern}\\)') or {
+		eprintln('failed to compile regex for process_post_mentions (err: ${err})')
+		return
+	}
+	matches := re.find_all_str(post.body)
+	mut mentioned_users := []int{}
+	for mat in matches {
+		println('found mentioned user: ${mat}')
+		username := mat#[2..-1]
+		user := app.get_user_by_name(username) or {
+			continue
+		}
+
+		if user.id in mentioned_users || user.id == author.id {
+			continue
+		}
+		mentioned_users << user.id
+
+		app.send_notification_to(
+			user.id,
+			'${author_name} mentioned you!',
+			'you have been mentioned in this post: *(${post.id})'
+		)
+	}
 }
