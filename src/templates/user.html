@@ -1,9 +1,181 @@
 @include 'partial/header.html'
 
-@include 'components/user/name.html'
-@include 'components/user/bio.html'
-@include 'components/user/posts.html'
-@include 'components/user/info.html'
-@include 'components/user/admin.html'
+<h1>
+	@{viewing.get_name()}
+	(@@@viewing.username)
+
+	@if viewing.pronouns != ''
+	(@viewing.pronouns)
+	@end
+
+	@if viewing.muted && viewing.admin
+	[muted admin, somehow]
+	@else if viewing.muted
+	[muted]
+	@else if viewing.admin
+	[admin]
+	@end
+</h1>
+
+@if app.logged_in_as(mut ctx, viewing.id)
+<p>this is you!</p>
+
+<div>
+	<form action="/api/post/new_post" method="post">
+		<h2>new post:</h2>
+		<input
+			type="text"
+			name="title"
+			id="title"
+			minlength="@app.config.post.title_min_len"
+			maxlength="@app.config.post.title_max_len"
+			pattern="@app.config.post.title_pattern"
+			placeholder="title"
+			required
+		>
+		<br>
+		<textarea
+			name="body"
+			id="body"
+			minlength="@app.config.post.body_min_len"
+			maxlength="@app.config.post.body_max_len"
+			rows="10"
+			cols="30"
+			placeholder="body"
+			required
+		></textarea>
+		<br>
+		<input type="submit" value="post!">
+	</form>
+</div>
+@end
+
+@if viewing.bio != ''
+<div>
+	<h2>bio:</h2>
+	<p>@viewing.bio</p>
+</div>
+@end
+
+<div>
+	<h2>posts:</h2>
+	@for post in app.get_posts_from_user(viewing.id)
+	@include 'components/post_small.html'
+	@end
+</div>
+
+<div>
+	<h2>user info:</h2>
+	<p>id: @viewing.id</p>
+	<p>username: @viewing.username</p>
+	<p>display name: @viewing.get_name()</p>
+	@if app.logged_in_as(mut ctx, viewing.id)
+	<p><a href="/api/user/logout">log out</a></p>
+	<p><a href="/api/user/full_logout">log out of all devices</a></p>
+	@end
+</div>
+
+@if app.logged_in_as(mut ctx, viewing.id)
+<div>
+	<h2>user settings:</h2>
+	<form action="/api/user/set_bio" method="post">
+		<label for="bio">bio:</label>
+		<br>
+		<textarea
+			name="bio"
+			id="bio"
+			cols="30"
+			rows="10"
+			minlength="@app.config.user.bio_min_len"
+			maxlength="@app.config.user.bio_max_len"
+			required
+		>@user.bio</textarea>
+		<input type="submit" value="save">
+	</form>
+	<form action="/api/user/set_pronouns" method="post">
+		<label for="pronouns">pronouns:</label>
+		<input
+			type="text"
+			name="pronouns"
+			id="pronouns"
+			minlength="@app.config.user.pronouns_min_len"
+			maxlength="@app.config.user.pronouns_max_len"
+			pattern="@app.config.user.pronouns_pattern"
+			value="@user.pronouns"
+			required
+		>
+		<br>
+		<input type="submit" value="save">
+	</form>
+	<form action="/api/user/set_nickname" method="post">
+		<label for="nickname">nickname:</label>
+		<input
+			type="text"
+			name="nickname"
+			id="nickname"
+			pattern="@app.config.user.nickname_pattern"
+			minlength="@app.config.user.nickname_min_len"
+			maxlength="@app.config.user.nickname_max_len"
+			value="@{user.nickname or { '' }}"
+			required
+		>
+		<input type="submit" value="save">
+	</form>
+	<form action="/api/user/set_nickname" method="post">
+		<input type="submit" value="reset nickname">
+	</form>
+	@if app.config.user.allow_changing_theme
+	<br>
+	<form action="/api/user/set_theme" method="post">
+		<label for="url">theme:</label>
+		<input type="url" name="url" id="url" value="@{user.theme or { '' }}">
+		<input type="submit" value="save">
+	</form>
+	@end
+</div>
+@end
+
+@if ctx.is_logged_in() && user.admin
+<div>
+	<h2>admin powers:</h2>
+	<form action="/api/user/set_muted" method="post">
+		<input
+			type="text"
+			name="id"
+			id="id"
+			value="@user.id"
+			required
+			readonly
+			hidden
+			aria-hidden
+		>
+		@if !user.muted
+		<input
+			type="checkbox"
+			name="muted"
+			id="muted"
+			value="true"
+			checked
+			readonly
+			hidden
+			aria-hidden
+		>
+		<input type="submit" value="mute">
+		@else
+		<input
+			type="checkbox"
+			name="muted"
+			id="muted"
+			value="false"
+			checked
+			readonly
+			hidden
+			aria-hidden
+		>
+		<input type="submit" value="unmute">
+		@end
+	</form>
+</div>
+@end
 
 @include 'partial/footer.html'
