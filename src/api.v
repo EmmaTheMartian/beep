@@ -382,33 +382,42 @@ fn (mut app App) api_user_delete(mut ctx Context, id int) veb.Result {
 ////// post //////
 
 @['/api/post/new_post'; post]
-fn (mut app App) api_post_new_post(mut ctx Context, title string, body string) veb.Result {
+fn (mut app App) api_post_new_post(mut ctx Context, replying_to int, title string, body string) veb.Result {
 	user := app.whoami(mut ctx) or {
 		ctx.error('not logged in!')
-		return ctx.redirect('/')
+		return ctx.redirect('/login')
 	}
 
 	if user.muted {
 		ctx.error('you are muted!')
-		return ctx.redirect('/me')
+		return ctx.redirect('/post/new')
 	}
 
 	// validate title
 	if !app.validators.post_title.validate(title) {
 		ctx.error('invalid title')
-		return ctx.redirect('/me')
+		return ctx.redirect('/post/new')
 	}
 
 	// validate body
 	if !app.validators.post_body.validate(body) {
 		ctx.error('invalid body')
-		return ctx.redirect('/me')
+		return ctx.redirect('/post/new')
 	}
 
-	post := Post{
+	mut post := Post{
 		author_id: user.id
 		title:     title
 		body:      body
+	}
+
+	if replying_to != 0 {
+		// check if replying post exists
+		app.get_post_by_id(replying_to) or {
+			ctx.error('the post you are trying to reply to does not exist')
+			return ctx.redirect('/post/new')
+		}
+		post.replying_to = replying_to
 	}
 
 	sql app.db {
@@ -416,17 +425,17 @@ fn (mut app App) api_post_new_post(mut ctx Context, title string, body string) v
 	} or {
 		ctx.error('failed to post!')
 		println('failed to post: ${post} from user ${user.id}')
-		return ctx.redirect('/me')
+		return ctx.redirect('/post/new')
 	}
 
 	// find the post's id to process mentions with
 	if x := app.get_post_by_author_and_timestamp(user.id, post.posted_at) {
 		app.process_post_mentions(x)
+		return ctx.redirect('/post/${x.id}')
 	} else {
 		ctx.error('failed to get_post_by_timestamp_and_author for ${post}')
+		return ctx.redirect('/me')
 	}
-
-	return ctx.redirect('/me')
 }
 
 @['/api/post/delete'; post]

@@ -4,10 +4,22 @@
 <script src="/static/js/render_body.js"></script>
 
 <div class="post post-full">
-	<h2><a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a> - @post.title</h2>
+	<h2>
+		<a href="/user/@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).username}"><strong>@{(app.get_user_by_id(post.author_id) or { app.get_unknown_user() }).get_name()}</strong></a>
+		-
+		@if replying_to_post.id == 0
+		@post.title
+		@else
+		replied to <a href="/user/@{replying_to_user.username}">@{replying_to_user.get_name()}</a>
+		@end
+	</h2>
 	<pre id="post-@{post.id}">@post.body</pre>
 	<p><em>likes: @{app.get_net_likes_for_post(post.id)}</em></p>
 	<p><em>posted at: @post.posted_at</em></p>
+
+	@if ctx.is_logged_in()
+	<p><a href="/post/@{post.id}/reply">reply</a></p>
+	@end
 
 	@if ctx.is_logged_in() && post.author_id == user.id
 	<p><a href="/post/@{post.id}/edit">edit post</a></p>

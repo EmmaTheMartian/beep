@@ -27,13 +27,14 @@ spec for beep:
 
 > represents a public post
 
-| name        | type      | desc                                   |
-|-------------|-----------|----------------------------------------|
-| `id`        | int       | identifier for this post               |
-| `author_id` | int       | id of the user that authored this post |
-| `title`     | string    | the title of this post                 |
-| `body`      | string    | the body of this post                  |
-| `posted_at` | time.Time | a timestamp of when this post was made |
+| name          | type      | desc                                         |
+|---------------|-----------|----------------------------------------------|
+| `id`          | int       | identifier for this post                     |
+| `author_id`   | int       | id of the user that authored this post       |
+| `replying_to` | ?int      | id of the post that this post is replying to |
+| `title`       | string    | the title of this post                       |
+| `body`        | string    | the body of this post                        |
+| `posted_at`   | time.Time | a timestamp of when this post was made       |
 
 ## `Like`
 

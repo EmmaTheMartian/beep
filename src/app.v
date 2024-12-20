@@ -154,6 +154,12 @@ pub fn (app &App) get_unknown_user() User {
 	}
 }
 
+pub fn (app &App) get_unknown_post() Post {
+	return Post{
+		title: 'unknown'
+	}
+}
+
 pub fn (app &App) logged_in_as(mut ctx Context, id int) bool {
 	if !ctx.is_logged_in() {
 		return false
@@ -308,12 +314,22 @@ pub fn (app &App) process_post_mentions(post &Post) {
 	}
 	author_name := author.get_name()
 
+	// used so we do not send more than one notification per post
+	mut notified_users := []int{}
+
+	// notify who we replied to, if applicable
+	if post.replying_to != none {
+		if x := app.get_post_by_id(post.replying_to) {
+			app.send_notification_to(x.author_id, '${author_name} replied to your post!', '${author_name} replied to *(${x.id})')
+		}
+	}
+
+	// find mentions
 	mut re := regex.regex_opt('@\\(${app.config.user.username_pattern}\\)') or {
 		eprintln('failed to compile regex for process_post_mentions (err: ${err})')
 		return
 	}
 	matches := re.find_all_str(post.body)
-	mut mentioned_users := []int{}
 	for mat in matches {
 		println('found mentioned user: ${mat}')
 		username := mat#[2..-1]
@@ -321,10 +337,10 @@ pub fn (app &App) process_post_mentions(post &Post) {
 			continue
 		}
 
-		if user.id in mentioned_users || user.id == author.id {
+		if user.id in notified_users || user.id == author.id {
 			continue
 		}
-		mentioned_users << user.id
+		notified_users << user.id
 
 		app.send_notification_to(
 			user.id,

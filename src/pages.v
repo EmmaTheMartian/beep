@@ -77,6 +77,19 @@ fn (mut app App) post(mut ctx Context, post_id int) veb.Result {
 	}
 	ctx.title = '${app.config.instance.name} - ${post.title}'
 	user := app.whoami(mut ctx) or { User{} }
+
+	mut replying_to_post := app.get_unknown_post()
+	mut replying_to_user := app.get_unknown_user()
+
+	if post.replying_to != none {
+		replying_to_post = app.get_post_by_id(post.replying_to) or {
+			app.get_unknown_post()
+		}
+		replying_to_user = app.get_user_by_id(replying_to_post.author_id) or {
+			app.get_unknown_user()
+		}
+	}
+
 	return $veb.html()
 }
 
@@ -96,4 +109,37 @@ fn (mut app App) edit(mut ctx Context, post_id int) veb.Result {
 	}
 	ctx.title = '${app.config.instance.name} - editing ${post.title}'
 	return $veb.html()
+}
+
+@['/post/:post_id/reply']
+fn (mut app App) reply(mut ctx Context, post_id int) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	post := app.get_post_by_id(post_id) or {
+		ctx.error('no such post')
+		return ctx.redirect('/')
+	}
+	ctx.title = '${app.config.instance.name} - reply to ${post.title}'
+	replying := true
+	replying_to := post_id
+	replying_to_user := app.get_user_by_id(post.author_id) or {
+		ctx.error('no such post')
+		return ctx.redirect('/')
+	}
+	return $veb.html('templates/new_post.html')
+}
+
+@['/post/new']
+fn (mut app App) new(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} - new post'
+	replying := false
+	replying_to := 0
+	replying_to_user := User{}
+	return $veb.html('templates/new_post.html')
 }

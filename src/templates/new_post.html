@@ -1,0 +1,67 @@
+@include 'partial/header.html'
+
+@if ctx.is_logged_in()
+
+@if replying
+<h1>reply to @{replying_to_user.get_name()} with...</h1>
+<p>(replying to <a href="/post/${replying_to}">this</a>)</p>
+@else
+<h2>make a post...</h2>
+@end
+
+<div>
+	<form action="/api/post/new_post" method="post">
+		@if replying
+		<input
+			type="number"
+			name="replying_to"
+			id="replying_to"
+			required aria-required
+			readonly aria-readonly
+			hidden aria-hidden
+			value="@replying_to"
+		>
+		<input
+			type="text"
+			name="title"
+			id="title"
+			value="reply to @{replying_to_user.get_name()}"
+			required aria-required
+			readonly aria-readonly
+			hidden aria-hidden
+		>
+		@else
+		<input
+			type="text"
+			name="title"
+			id="title"
+			minlength="@app.config.post.title_min_len"
+			maxlength="@app.config.post.title_max_len"
+			pattern="@app.config.post.title_pattern"
+			placeholder="title"
+			required aria-required
+		>
+		@end
+
+		<br>
+		<textarea
+			name="body"
+			id="body"
+			minlength="@app.config.post.body_min_len"
+			maxlength="@app.config.post.body_max_len"
+			rows="10"
+			cols="30"
+			placeholder="in reply to @{replying_to_user.get_name()}..."
+			required
+		></textarea>
+
+		<br>
+
+		<input type="submit" value="post!">
+	</form>
+</div>
+@else
+<p>uh oh, you need to be logged in to see this page</p>
+@end
+
+@include 'partial/footer.html'
