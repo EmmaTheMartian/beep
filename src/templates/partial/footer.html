@@ -1,11 +1,21 @@
 	</main>
 
 	<footer>
-		<p>powered by beep</p>
-		<p><a href="https://github.com/emmathemartian/beep">source</a></p>
-		@if app.config.dev_mode
-		<p>token: @{ctx.get_cookie('token')}</p>
-		@end
+		<p>
+			<a href="/settings">settings</a>
+			-
+
+			@if app.config.dev_mode || (ctx.is_logged_in() && user.admin)
+			<a href="/admin">admin</a>
+			-
+			@end
+
+			@if ctx.is_logged_in()
+			<a href="/api/user/logout">log out</a>
+			@end
+		</p>
+
+		<p>powered by <a href="https://github.com/emmathemartian/beep">beep</a></p>
 	</footer>
 
 </body>

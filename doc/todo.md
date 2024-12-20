@@ -4,12 +4,15 @@
 
 ## in-progress
 
+- [ ] post:replies
+
 ## planing
 
-- [ ] post:replies
 - [ ] post:tags ('hashtags')
 - [ ] post:images (should have a config.maple toggle to enable/disable)
 - [ ] post:saving (add the post to a list of saved posts that a user can view later)
+- [ ] user:change password
+- [ ] user:change username
 
 ## ideas
 

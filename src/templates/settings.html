@@ -1,0 +1,117 @@
+@include 'partial/header.html'
+
+@if ctx.is_logged_in()
+<h1>user settings:</h1>
+
+<form action="/api/user/set_bio" method="post">
+	<label for="bio">bio:</label>
+	<br>
+	<textarea
+		name="bio"
+		id="bio"
+		cols="30"
+		rows="10"
+		minlength="@app.config.user.bio_min_len"
+		maxlength="@app.config.user.bio_max_len"
+		required
+	>@user.bio</textarea>
+	<br>
+	<input type="submit" value="save">
+</form>
+
+<hr>
+
+<form action="/api/user/set_pronouns" method="post">
+	<label for="pronouns">pronouns:</label>
+	<input
+		type="text"
+		name="pronouns"
+		id="pronouns"
+		minlength="@app.config.user.pronouns_min_len"
+		maxlength="@app.config.user.pronouns_max_len"
+		pattern="@app.config.user.pronouns_pattern"
+		value="@user.pronouns"
+		required
+	>
+	<input type="submit" value="save">
+</form>
+
+<hr>
+
+<form action="/api/user/set_nickname" method="post">
+	<label for="nickname">nickname:</label>
+	<input
+		type="text"
+		name="nickname"
+		id="nickname"
+		pattern="@app.config.user.nickname_pattern"
+		minlength="@app.config.user.nickname_min_len"
+		maxlength="@app.config.user.nickname_max_len"
+		value="@{user.nickname or { '' }}"
+		required
+	>
+	<input type="submit" value="save">
+</form>
+
+<form action="/api/user/set_nickname" method="post">
+	<input type="submit" value="reset nickname">
+</form>
+
+@if app.config.instance.allow_changing_theme
+<hr>
+<form action="/api/user/set_theme" method="post">
+	<label for="url">theme:</label>
+	<input type="url" name="url" id="url" value="@{user.theme or { '' }}">
+	<input type="submit" value="save">
+</form>
+@end
+
+<hr>
+
+<details>
+	<summary>dangerous settings (click to reveal)</summary>
+	<div>
+		<details>
+			<summary>account deletion (click to reveal)</summary>
+			<form action="/api/user/delete" autocomplete="off">
+				<input
+					type="number"
+					name="id"
+					id="id"
+					value="@user.id"
+					required
+					readonly
+					hidden
+					aria-hidden
+				>
+				<p><strong>there is NO GOING BACK after deleting your account.</strong></p>
+				<p><strong>EVERY ONE of your posts, notifications, likes, dislikes, and ALL OTHER USER DATA WILL BE PERMANENTLY DELETED</strong></p>
+				<div>
+					<input type="checkbox" name="are-you-sure" id="are-you-sure" required>
+					<label for="are-you-sure">click to confirm</label>
+				</div>
+				<br>
+				<div>
+					<input type="checkbox" name="are-you-really-sure" id="are-you-really-sure" required>
+					<label for="are-you-really-sure">click to doubly confirm</label>
+				</div>
+				<br>
+				<div>
+					<input type="checkbox" name="are-you-absolutely-sure" id="are-you-absolutely-sure" required>
+					<label for="are-you-absolutely-sure">click to triply confirm</label>
+				</div>
+				<br>
+				<details>
+					<summary>(click to reveal deletion button)</summary>
+					<input type="submit" value="delete your account">
+				</details>
+			</form>
+		</details>
+	</div>
+</details>
+
+@else
+<p>uh oh, you need to be logged in to view this page!</p>
+@end
+
+@include 'partial/footer.html'

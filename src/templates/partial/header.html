@@ -7,12 +7,16 @@
 	<link rel="icon" href="/favicon.png" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>@ctx.title</title>
+
 	@include 'assets/style.html'
+
 	@if ctx.is_logged_in() && user.theme != none
 	<link rel="stylesheet" href="@user.get_theme()">
 	@else if app.config.instance.default_theme != ''
 	<link rel="stylesheet" href="@app.config.instance.default_theme">
 	@endif
+
+	<link rel="shortcut icon" href="/static/favicon/favicon.ico" type="image/png" sizes="16x16 32x32">
 </head>
 
 <body>
@@ -26,17 +30,10 @@
 		<a href="/">home</a>
 		-
 
-		@if app.config.dev_mode || (ctx.is_logged_in() && user.admin)
-		<a href="/admin">admin</a>
-		-
-		@end
-
 		@if ctx.is_logged_in()
 		<a href="/me">profile</a>
 		-
 		<a href="/inbox">inbox@{app.get_notification_count_for_frontend(user.id, 99)}</a>
-		-
-		<a href="/api/user/logout">log out</a>
 		@else
 		<a href="/login">log in</a>
 		<span>or</span>

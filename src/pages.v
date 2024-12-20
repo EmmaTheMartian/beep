@@ -33,6 +33,15 @@ fn (mut app App) me(mut ctx Context) veb.Result {
 	return ctx.redirect('/user/${user.username}')
 }
 
+fn (mut app App) settings(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} - settings'
+	return $veb.html()
+}
+
 fn (mut app App) admin(mut ctx Context) veb.Result {
 	ctx.title = '${app.config.instance.name} dashboard'
 	user := app.whoami(mut ctx) or { User{} }
