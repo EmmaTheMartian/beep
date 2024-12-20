@@ -13,7 +13,7 @@
 		rows="10"
 		minlength="@app.config.user.bio_min_len"
 		maxlength="@app.config.user.bio_max_len"
-		required
+		required aria-required
 	>@user.bio</textarea>
 	<br>
 	<input type="submit" value="save">
@@ -31,7 +31,7 @@
 		maxlength="@app.config.user.pronouns_max_len"
 		pattern="@app.config.user.pronouns_pattern"
 		value="@user.pronouns"
-		required
+		required aria-required
 	>
 	<input type="submit" value="save">
 </form>
@@ -48,7 +48,7 @@
 		minlength="@app.config.user.nickname_min_len"
 		maxlength="@app.config.user.nickname_max_len"
 		value="@{user.nickname or { '' }}"
-		required
+		required aria-required
 	>
 	<input type="submit" value="save">
 </form>
@@ -59,6 +59,7 @@
 
 @if app.config.instance.allow_changing_theme
 <hr>
+
 <form action="/api/user/set_theme" method="post">
 	<label for="url">theme:</label>
 	<input type="url" name="url" id="url" value="@{user.theme or { '' }}">
@@ -68,46 +69,91 @@
 
 <hr>
 
+<form action="/api/user/set_username" method="post">
+	<label for="new_username">username:</label>
+	<input
+		type="text"
+		name="new_username"
+		id="new_username"
+		pattern="@app.config.user.username_pattern"
+		minlength="@app.config.user.username_min_len"
+		maxlength="@app.config.user.username_max_len"
+		value="@{user.username}"
+		required aria-required
+	>
+	<input type="submit" value="save">
+</form>
+
+<hr>
+
 <details>
 	<summary>dangerous settings (click to reveal)</summary>
-	<div>
-		<details>
-			<summary>account deletion (click to reveal)</summary>
-			<form action="/api/user/delete" autocomplete="off">
-				<input
-					type="number"
-					name="id"
-					id="id"
-					value="@user.id"
-					required
-					readonly
-					hidden
-					aria-hidden
-				>
-				<p><strong>there is NO GOING BACK after deleting your account.</strong></p>
-				<p><strong>EVERY ONE of your posts, notifications, likes, dislikes, and ALL OTHER USER DATA WILL BE PERMANENTLY DELETED</strong></p>
-				<div>
-					<input type="checkbox" name="are-you-sure" id="are-you-sure" required>
-					<label for="are-you-sure">click to confirm</label>
-				</div>
-				<br>
-				<div>
-					<input type="checkbox" name="are-you-really-sure" id="are-you-really-sure" required>
-					<label for="are-you-really-sure">click to doubly confirm</label>
-				</div>
-				<br>
-				<div>
-					<input type="checkbox" name="are-you-absolutely-sure" id="are-you-absolutely-sure" required>
-					<label for="are-you-absolutely-sure">click to triply confirm</label>
-				</div>
-				<br>
-				<details>
-					<summary>(click to reveal deletion button)</summary>
-					<input type="submit" value="delete your account">
-				</details>
-			</form>
-		</details>
-	</div>
+
+	<details>
+		<summary>change password (click to reveal)</summary>
+		<form action="/api/user/set_password" method="post">
+			<p>changing your password will log you out of all devices, so you will need to log in again after changing it.</p>
+			<label for="current_password">current password:</label>
+			<input
+				type="password"
+				name="current_password"
+				id="current_password"
+				pattern="@app.config.user.password_pattern"
+				minlength="@app.config.user.password_min_len"
+				maxlength="@app.config.user.password_max_len"
+				required aria-required
+				autocomplete="off" aria-autocomplete="off"
+			>
+			<label for="new_password">new password:</label>
+			<input
+				type="password"
+				name="new_password"
+				id="new_password"
+				pattern="@app.config.user.password_pattern"
+				minlength="@app.config.user.password_min_len"
+				maxlength="@app.config.user.password_max_len"
+				required aria-required
+				autocomplete="off" aria-autocomplete="off"
+			>
+			<input type="submit" value="save">
+		</form>
+	</details>
+
+	<details>
+		<summary>account deletion (click to reveal)</summary>
+		<form action="/api/user/delete" autocomplete="off">
+			<input
+				type="number"
+				name="id"
+				id="id"
+				value="@user.id"
+				required aria-required
+				readonly aria-readonly
+				hidden aria-hidden
+			>
+			<p><strong>there is NO GOING BACK after deleting your account.</strong></p>
+			<p><strong>EVERY ONE of your posts, notifications, likes, dislikes, and ALL OTHER USER DATA WILL BE PERMANENTLY DELETED</strong></p>
+			<div>
+				<input type="checkbox" name="are-you-sure" id="are-you-sure" required aria-required>
+				<label for="are-you-sure">click to confirm</label>
+			</div>
+			<br>
+			<div>
+				<input type="checkbox" name="are-you-really-sure" id="are-you-really-sure" required aria-required>
+				<label for="are-you-really-sure">click to doubly confirm</label>
+			</div>
+			<br>
+			<div>
+				<input type="checkbox" name="are-you-absolutely-sure" id="are-you-absolutely-sure" required aria-required>
+				<label for="are-you-absolutely-sure">click to triply confirm</label>
+			</div>
+			<br>
+			<details>
+				<summary>(click to reveal deletion button)</summary>
+				<input type="submit" value="delete your account">
+			</details>
+		</form>
+	</details>
 </details>
 
 @else

@@ -11,8 +11,6 @@
 
 - [ ] post:images (should have a config.maple toggle to enable/disable)
 - [ ] post:saving (add the post to a list of saved posts that a user can view later)
-- [ ] user:change password
-- [ ] user:change username
 
 ## ideas
 
@@ -26,6 +24,8 @@
 - [x] user:listed pronouns
 - [x] user:notifications
 - [x] user:deletion
+- [x] user:change password
+- [x] user:change username
 - [x] post:likes/dislikes
 - [x] post:mentioning ('tagging') other users in posts
 	- [x] post:mentioning:who mentioned you (send notifications when a user mentions you)

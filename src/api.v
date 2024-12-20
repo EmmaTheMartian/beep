@@ -71,6 +71,70 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 	return ctx.redirect('/')
 }
 
+@['/api/user/set_username'; post]
+fn (mut app App) api_user_set_username(mut ctx Context, new_username string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	if app.get_user_by_name(new_username) != none {
+		ctx.error('username taken')
+		return ctx.redirect('/settings')
+	}
+
+	// validate username
+	if !app.validators.username.validate(new_username) {
+		ctx.error('invalid username')
+		return ctx.redirect('/settings')
+	}
+
+	sql app.db {
+		update User set username = new_username where id == user.id
+	} or {
+		eprintln('failed to update username for ${user.id}')
+		ctx.error('failed to update username')
+	}
+
+	return ctx.redirect('/settings')
+}
+
+@['/api/user/set_password'; post]
+fn (mut app App) api_user_set_password(mut ctx Context, current_password string, new_password string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	if !auth.compare_password_with_hash(current_password, user.password_salt, user.password) {
+		ctx.error('current_password is incorrect')
+		return ctx.redirect('/settings')
+	}
+
+	// validate password
+	if !app.validators.password.validate(new_password) {
+		ctx.error('invalid password')
+		return ctx.redirect('/settings')
+	}
+
+	// invalidate tokens
+	app.auth.delete_tokens_for_user(user.id) or {
+		eprintln('failed to yeet tokens during password deletion for ${user.id} (${err})')
+		return ctx.redirect('/settings')
+	}
+
+	hashed_new_password := auth.hash_password_with_salt(new_password, user.password_salt)
+
+	sql app.db {
+		update User set password = hashed_new_password where id == user.id
+	} or {
+		eprintln('failed to update password for ${user.id}')
+		ctx.error('failed to update password')
+	}
+
+	return ctx.redirect('/login')
+}
+
 @['/api/user/login'; post]
 fn (mut app App) api_user_login(mut ctx Context, username string, password string) veb.Result {
 	user := app.get_user_by_name(username) or {
@@ -105,7 +169,7 @@ fn (mut app App) api_user_logout(mut ctx Context) veb.Result {
 	if token := ctx.get_cookie('token') {
 		if user := app.get_user_by_token(ctx, token) {
 			app.auth.delete_tokens_for_ip(ctx.ip()) or {
-				eprintln('failed to yeet tokens for ${user.id} with ip ${ctx.ip()}')
+				eprintln('failed to yeet tokens for ${user.id} with ip ${ctx.ip()} (${err})')
 				return ctx.redirect('/login')
 			}
 		} else {

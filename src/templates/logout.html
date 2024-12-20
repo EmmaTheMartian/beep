@@ -1,0 +1,17 @@
+@include 'partial/header.html'
+
+@if ctx.is_logged_in()
+<h1>log out</h1>
+
+<p>you are currently logged in as: @{user.get_name()}</p>
+
+<div>
+	<p><a href="/api/user/logout">log out</a></p>
+	<hr>
+	<p><a href="/api/user/full_logout">log out of all devices</a></p>
+</div>
+@else
+<p>you need to be logged in to log out!</p>
+@end
+
+@include 'partial/footer.html'
