@@ -143,3 +143,24 @@ fn (mut app App) new(mut ctx Context) veb.Result {
 	replying_to_user := User{}
 	return $veb.html('templates/new_post.html')
 }
+
+@['/tag/:tag']
+fn (mut app App) tag(mut ctx Context, tag string) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} - #${tag}'
+	offset := 0
+	return $veb.html()
+}
+
+@['/tag/:tag/:offset']
+fn (mut app App) tag_with_offset(mut ctx Context, tag string, offset int) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} - #${tag}'
+	return $veb.html('templates/tag.html')
+}

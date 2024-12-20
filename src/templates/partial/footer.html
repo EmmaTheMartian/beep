@@ -1,19 +1,17 @@
 	</main>
 
 	<footer>
+		@if ctx.is_logged_in()
 		<p>
 			<a href="/settings">settings</a>
+			@if user.admin
 			-
-
-			@if app.config.dev_mode || (ctx.is_logged_in() && user.admin)
 			<a href="/admin">admin</a>
+			@end
 			-
-			@end
-
-			@if ctx.is_logged_in()
 			<a href="/api/user/logout">log out</a>
-			@end
 		</p>
+		@end
 
 		<p>powered by <a href="https://github.com/emmathemartian/beep">beep</a></p>
 	</footer>

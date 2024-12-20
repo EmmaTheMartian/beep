@@ -18,13 +18,22 @@ const render_body = async id => {
 				}
 				const link = document.createElement('a')
 				link.href = `/user/${match[0].substring(2, match[0].length - 1)}`
-				link.innerText = s
+				link.innerText = '@' + s
 				cache[match[0]] = link.outerHTML
 				element.innerHTML = element.innerHTML.replace(match[0], link.outerHTML)
 			})
 		}
-		// hashtag
+		// tags
 		else if (match[0][0] == '#') {
+			// we do not cache tags because they do not need to do
+			// any http queries, and most people will not use the
+			// same tag multiple times in a single post.
+			const link = document.createElement('a')
+			const tag = match[0].substring(2, match[0].length - 1)
+			link.href = `/tag/${tag}`
+			link.innerText = '#' + tag
+			cache[match[0]] = link.outerHTML
+			element.innerHTML = element.innerHTML.replace(match[0], link.outerHTML)
 		}
 		// post reference
 		else if (match[0][0] == '*') {
@@ -38,7 +47,7 @@ const render_body = async id => {
 				}
 				const link = document.createElement('a')
 				link.href = `/post/${match[0].substring(2, match[0].length - 1)}`
-				link.innerText = s
+				link.innerText = '*' + s
 				cache[match[0]] = link.outerHTML
 				element.innerHTML = element.innerHTML.replace(match[0], link.outerHTML)
 			})

@@ -108,6 +108,13 @@ pub fn (app &App) get_post_by_author_and_timestamp(author_id int, timestamp time
 	return posts[0]
 }
 
+pub fn (app &App) get_posts_with_tag(tag string, offset int) []Post {
+	posts := sql app.db {
+		select from Post where body like '%#(${tag})%' order by posted_at desc limit 10 offset offset
+	} or { [] }
+	return posts
+}
+
 pub fn (app &App) get_pinned_posts() []Post {
 	posts := sql app.db {
 		select from Post where pinned == true

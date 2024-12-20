@@ -1,0 +1,11 @@
+@include 'partial/header.html'
+
+<h1>posts with #@{tag}: (*@{offset} to *@{offset+10})</h1>
+
+<div>
+	@for post in app.get_posts_with_tag(tag, offset)
+	@include 'components/post_mini.html'
+	@end
+</div>
+
+@include 'partial/footer.html'

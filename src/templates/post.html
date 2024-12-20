@@ -70,6 +70,21 @@
 		<input type="submit" value="delete">
 	</form>
 
+	<form action="/api/post/pin" method="post">
+		<input
+			type="number"
+			name="id"
+			id="id"
+			placeholder="post id"
+			value="@post.id"
+			required
+			readonly
+			hidden
+			aria-hidden
+		>
+		<input type="submit" value="pin">
+	</form>
+
 	</div>
 	@end
 </div>

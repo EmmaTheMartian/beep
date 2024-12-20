@@ -23,6 +23,7 @@
 <div>
 	<form action="/api/post/new_post" method="post">
 		<h2>new post:</h2>
+
 		<input
 			type="text"
 			name="title"
@@ -31,9 +32,10 @@
 			maxlength="@app.config.post.title_max_len"
 			pattern="@app.config.post.title_pattern"
 			placeholder="title"
-			required
+			required aria-required
 		>
 		<br>
+
 		<textarea
 			name="body"
 			id="body"
@@ -42,9 +44,10 @@
 			rows="10"
 			cols="30"
 			placeholder="body"
-			required
+			required aria-required
 		></textarea>
 		<br>
+
 		<input type="submit" value="post!">
 	</form>
 </div>
@@ -84,10 +87,9 @@
 			name="id"
 			id="id"
 			value="@user.id"
-			required
-			readonly
-			hidden
-			aria-hidden
+			required aria-required
+			readonly aria-readonly
+			hidden aria-hidden
 		>
 		@if !user.muted
 		<input
@@ -95,10 +97,9 @@
 			name="muted"
 			id="muted"
 			value="true"
-			checked
-			readonly
-			hidden
-			aria-hidden
+			checked aria-checked
+			readonly aria-readonly
+			hidden aria-hidden
 		>
 		<input type="submit" value="mute">
 		@else
@@ -107,10 +108,9 @@
 			name="muted"
 			id="muted"
 			value="false"
-			checked
-			readonly
-			hidden
-			aria-hidden
+			checked aria-checked
+			readonly aria-readonly
+			hidden aria-hidden
 		>
 		<input type="submit" value="unmute">
 		@end

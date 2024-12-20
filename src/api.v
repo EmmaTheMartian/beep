@@ -586,6 +586,29 @@ fn (mut app App) api_post_edit(mut ctx Context, id int, title string, body strin
 	return ctx.redirect('/post/${id}')
 }
 
+@['/api/post/pin'; post]
+fn (mut app App) api_post_pin(mut ctx Context, id int) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	if user.admin {
+		sql app.db {
+			update Post set pinned = true where id == id
+		} or {
+			eprintln('failed to pin post: ${id}')
+			ctx.error('failed to pin post')
+			return ctx.redirect('/post/${id}')
+		}
+		return ctx.redirect('/post/${id}')
+	} else {
+		ctx.error('insufficient permissions!')
+		eprintln('insufficient perms to pin post: ${id} (${user.id})')
+		return ctx.redirect('/')
+	}
+}
+
 ////// site //////
 
 @['/api/site/set_motd'; post]

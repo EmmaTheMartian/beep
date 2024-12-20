@@ -52,7 +52,7 @@ pub mut:
 		bio_max_len      int
 		bio_pattern      string
 	}
-	welcome struct {
+	welcome     struct {
 	pub mut:
 		summary string
 		body    string

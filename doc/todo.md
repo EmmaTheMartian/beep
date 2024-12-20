@@ -6,7 +6,9 @@
 
 ## planing
 
-- [ ] post:tags ('hashtags')
+> p.s. when initially writing "planing," i made a typo. it should be "planning."
+> however, i will not be fixing it, because it is funny.
+
 - [ ] post:images (should have a config.maple toggle to enable/disable)
 - [ ] post:saving (add the post to a list of saved posts that a user can view later)
 - [ ] user:change password
@@ -29,6 +31,7 @@
 	- [x] post:mentioning:who mentioned you (send notifications when a user mentions you)
 - [x] post:editing
 - [x] post:replies
+- [x] post:tags ('hashtags')
 - [ ] ~~site:stylesheet (and a toggle for html-only mode)~~
 	- replaced with per-user optional stylesheets
 - [x] site:message of the day (admins can add a welcome message displayed on index.html)
