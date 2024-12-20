@@ -26,7 +26,8 @@ pub mut:
 	}
 }
 
-// get a user by their token, returns none if the user was not found.
+// get_user_by_token returns a user by their token, returns none if the user was
+// not found.
 pub fn (app &App) get_user_by_token(ctx &Context, token string) ?User {
 	user_token := app.auth.find_token(token, ctx.ip()) or {
 		eprintln('no such user corresponding to token')
@@ -35,7 +36,8 @@ pub fn (app &App) get_user_by_token(ctx &Context, token string) ?User {
 	return app.get_user_by_id(user_token.user_id)
 }
 
-// returns the current logged in user, or none if the user is not logged in.
+// whoami returns the current logged in user, or none if the user is not logged
+// in.
 pub fn (app &App) whoami(mut ctx Context) ?User {
 	token := ctx.get_cookie('token') or { return none }.trim_space()
 	if token == '' {
@@ -69,21 +71,21 @@ pub fn (app &App) whoami(mut ctx Context) ?User {
 	}
 }
 
-// get a user representing an unknown user
+// get_unknown_user returns a user representing an unknown user
 pub fn (app &App) get_unknown_user() User {
 	return User{
 		username: 'unknown'
 	}
 }
 
-// get a post representing an unknown post
+// get_unknown_post returns a post representing an unknown post
 pub fn (app &App) get_unknown_post() Post {
 	return Post{
 		title: 'unknown'
 	}
 }
 
-// returns true if the user is logged in as the provided user id.
+// logged_in_as returns true if the user is logged in as the provided user id.
 pub fn (app &App) logged_in_as(mut ctx Context, id int) bool {
 	if !ctx.is_logged_in() {
 		return false
@@ -91,15 +93,15 @@ pub fn (app &App) logged_in_as(mut ctx Context, id int) bool {
 	return app.whoami(mut ctx) or { return false }.id == id
 }
 
-// get the site's message of the day.
+// get_motd returns the site's message of the day.
 @[inline]
 pub fn (app &App) get_motd() string {
 	site := app.get_or_create_site_config()
 	return site.motd
 }
 
-// get the notification count for a given user, formatted for usage on the
-// frontend.
+// get_notification_count_for_frontend returns the notification count for a
+// given user, formatted for usage on the frontend.
 pub fn (app &App) get_notification_count_for_frontend(user_id int, limit int) string {
 	count := app.get_notification_count(user_id, limit)
 	if count == 0 {
@@ -111,7 +113,8 @@ pub fn (app &App) get_notification_count_for_frontend(user_id int, limit int) st
 	}
 }
 
-// processes a post's body to send notifications for mentions or replies.
+// process_post_mentions parses a post's body to send notifications for mentions
+// or replies.
 pub fn (app &App) process_post_mentions(post &Post) {
 	author := app.get_user_by_id(post.author_id) or {
 		eprintln('process_post_mentioned called on a post with a non-existent author: ${post}')

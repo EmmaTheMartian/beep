@@ -14,7 +14,7 @@ pub mut:
 	muted bool
 	admin bool
 
-	theme ?string
+	theme string
 
 	bio      string
 	pronouns string
@@ -22,16 +22,15 @@ pub mut:
 	created_at time.Time = time.now()
 }
 
+// get_name returns the user's nickname if it is not none, if so then their
+// username is returned.
 @[inline]
 pub fn (user User) get_name() string {
 	return user.nickname or { user.username }
 }
 
-@[inline]
-pub fn (user User) get_theme() string {
-	return user.theme or { '' }
-}
-
+// to_str_without_sensitive_data returns the stringified data for the user with
+// their password and salt censored.
 @[inline]
 pub fn (user User) to_str_without_sensitive_data() string {
 	return user.str()

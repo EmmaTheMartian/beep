@@ -1,6 +1,6 @@
 module entity
 
-// stores like information for posts
+// Like stores like information for a post.
 pub struct Like {
 pub mut:
 	id      int @[primary; sql: serial]
@@ -9,7 +9,7 @@ pub mut:
 	is_like bool
 }
 
-// Stores total likes per post
+// LikeCache stores the total likes for a post.
 pub struct LikeCache {
 pub mut:
 	id      int @[primary; sql: serial]

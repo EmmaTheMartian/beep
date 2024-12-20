@@ -2,7 +2,7 @@ module database
 
 import entity { Like, LikeCache }
 
-// returns the net likes of the given post
+// get_net_likes_for_post returns the net likes of the given post.
 pub fn (app &DatabaseAccess) get_net_likes_for_post(post_id int) int {
 	// check cache
 	cache := sql app.db {

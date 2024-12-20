@@ -3,7 +3,7 @@ module database
 import time
 import entity { Post, Like, LikeCache }
 
-// get a post by its id, returns none if it does not exist
+// get_post_by_id gets a post by its id, returns none if it does not exist.
 pub fn (app &DatabaseAccess) get_post_by_id(id int) ?Post {
 	posts := sql app.db {
 		select from Post where id == id limit 1
@@ -14,7 +14,8 @@ pub fn (app &DatabaseAccess) get_post_by_id(id int) ?Post {
 	return posts[0]
 }
 
-// get a post by its author and timestamp, returns none if it does not exist
+// get_post_by_author_and_timestamp gets a post by its author and timestamp,
+// returns none if it does not exist
 pub fn (app &DatabaseAccess) get_post_by_author_and_timestamp(author_id int, timestamp time.Time) ?Post {
 	posts := sql app.db {
 		select from Post where author_id == author_id && posted_at == timestamp order by posted_at desc limit 1
@@ -25,8 +26,9 @@ pub fn (app &DatabaseAccess) get_post_by_author_and_timestamp(author_id int, tim
 	return posts[0]
 }
 
-// get a list of posts given a tag. this performs sql string operations and
-// probably is not very efficient, use sparingly.
+// get_posts_with_tag gets a list of the 10 most recent posts with the given tag.
+// this performs sql  string operations and probably is not very efficient, use
+// sparingly.
 pub fn (app &DatabaseAccess) get_posts_with_tag(tag string, offset int) []Post {
 	posts := sql app.db {
 		select from Post where body like '%#(${tag})%' order by posted_at desc limit 10 offset offset
@@ -34,7 +36,7 @@ pub fn (app &DatabaseAccess) get_posts_with_tag(tag string, offset int) []Post {
 	return posts
 }
 
-// returns a list of all pinned posts
+// get_pinned_posts returns a list of all pinned posts.
 pub fn (app &DatabaseAccess) get_pinned_posts() []Post {
 	posts := sql app.db {
 		select from Post where pinned == true
@@ -42,7 +44,7 @@ pub fn (app &DatabaseAccess) get_pinned_posts() []Post {
 	return posts
 }
 
-// returns a list of the ten most recent posts.
+// get_recent_posts returns a list of the ten most recent posts.
 pub fn (app &DatabaseAccess) get_recent_posts() []Post {
 	posts := sql app.db {
 		select from Post order by posted_at desc limit 10
@@ -50,7 +52,7 @@ pub fn (app &DatabaseAccess) get_recent_posts() []Post {
 	return posts
 }
 
-// returns a list of the ten most liked posts.
+// get_popular_posts returns a list of the ten most liked posts.
 // TODO: make this time-gated (i.e, top ten liked posts of the day)
 pub fn (app &DatabaseAccess) get_popular_posts() []Post {
 	cached_likes := sql app.db {
@@ -65,7 +67,8 @@ pub fn (app &DatabaseAccess) get_popular_posts() []Post {
 	return posts
 }
 
-// returns a list of all posts from a user in descending order of date
+// get_posts_from_user returns a list of all posts from a user in descending
+// order by posting date.
 pub fn (app &DatabaseAccess) get_posts_from_user(user_id int) []Post {
 	posts := sql app.db {
 		select from Post where author_id == user_id order by posted_at desc

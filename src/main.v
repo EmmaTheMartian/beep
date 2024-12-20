@@ -7,17 +7,6 @@ import entity
 import os
 import webapp { App, Context, StringValidator }
 
-fn init_db(db pg.DB) ! {
-	sql db {
-		create table entity.Site
-		create table entity.User
-		create table entity.Post
-		create table entity.Like
-		create table entity.LikeCache
-		create table entity.Notification
-	}!
-}
-
 fn main() {
 	config := webapp.load_config_from(os.args[1])
 
@@ -54,7 +43,14 @@ fn main() {
 	app.mount_static_folder_at(app.config.static_path, '/static')!
 
 	println('-> initializing database...')
-	init_db(db)!
+	sql db {
+		create table entity.Site
+		create table entity.User
+		create table entity.Post
+		create table entity.Like
+		create table entity.LikeCache
+		create table entity.Notification
+	}!
 	println('<- done')
 
 	// make the website config, if it does not exist

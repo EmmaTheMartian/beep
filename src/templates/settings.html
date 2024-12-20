@@ -62,7 +62,7 @@
 
 <form action="/api/user/set_theme" method="post">
 	<label for="url">theme:</label>
-	<input type="url" name="url" id="url" value="@{user.theme or { '' }}">
+	<input type="url" name="url" id="url" value="@user.theme">
 	<input type="submit" value="save">
 </form>
 @end

@@ -2,7 +2,7 @@ module webapp
 
 import regex
 
-// handles validation of user-input fields
+// StringValidator handles validation of user-input fields.
 pub struct StringValidator {
 pub:
 	min_len int
@@ -10,12 +10,16 @@ pub:
 	pattern regex.RE
 }
 
+// validate validates a given string and returns true if it succeeded and false
+// otherwise.
 @[inline]
 pub fn (validator StringValidator) validate(str string) bool {
 	return str.len > validator.min_len && str.len < validator.max_len
 		&& validator.pattern.matches_string(str)
 }
 
+// StringValidator.new creates a new StringValidator with the given min, max,
+// and pattern.
 pub fn StringValidator.new(min int, max int, pattern string) StringValidator {
 	mut re := regex.new()
 	re.compile_opt(pattern) or { panic(err) }

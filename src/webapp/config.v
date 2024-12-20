@@ -2,6 +2,7 @@ module webapp
 
 import emmathemartian.maple
 
+// Config stores constant site-wide configuration data.
 pub struct Config {
 pub mut:
 	dev_mode    bool
