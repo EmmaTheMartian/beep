@@ -1,4 +1,4 @@
-module main
+module webapp
 
 import veb
 import auth
@@ -36,16 +36,7 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 		user.theme = app.config.instance.default_theme
 	}
 
-	sql app.db {
-		insert user into User
-	} or {
-		eprintln('failed to insert user ${user}')
-		return ctx.redirect('/')
-	}
-
-	println('reg: ${username}')
-
-	if x := app.get_user_by_name(username) {
+	if x := app.new_user(user) {
 		app.send_notification_to(
 			x.id,
 			app.config.welcome.summary.replace('%s', x.get_name()),
@@ -89,10 +80,7 @@ fn (mut app App) api_user_set_username(mut ctx Context, new_username string) veb
 		return ctx.redirect('/settings')
 	}
 
-	sql app.db {
-		update User set username = new_username where id == user.id
-	} or {
-		eprintln('failed to update username for ${user.id}')
+	if !app.set_username(user.id, new_username) {
 		ctx.error('failed to update username')
 	}
 
@@ -125,10 +113,7 @@ fn (mut app App) api_user_set_password(mut ctx Context, current_password string,
 
 	hashed_new_password := auth.hash_password_with_salt(new_password, user.password_salt)
 
-	sql app.db {
-		update User set password = hashed_new_password where id == user.id
-	} or {
-		eprintln('failed to update password for ${user.id}')
+	if !app.set_password(user.id, hashed_new_password) {
 		ctx.error('failed to update password')
 	}
 
@@ -234,10 +219,7 @@ fn (mut app App) api_user_set_nickname(mut ctx Context, nickname string) veb.Res
 		return ctx.redirect('/me')
 	}
 
-	sql app.db {
-		update User set nickname = clean_nickname where id == user.id
-	} or {
-		ctx.error('failed to change nickname')
+	if !app.set_nickname(user.id, clean_nickname) {
 		eprintln('failed to update nickname for ${user} (${user.nickname} -> ${clean_nickname})')
 		return ctx.redirect('/me')
 	}
@@ -246,25 +228,27 @@ fn (mut app App) api_user_set_nickname(mut ctx Context, nickname string) veb.Res
 }
 
 @['/api/user/set_muted'; post]
-fn (mut app App) api_user_set_muted(mut ctx Context, muted bool) veb.Result {
+fn (mut app App) api_user_set_muted(mut ctx Context, id int, muted bool) veb.Result {
 	user := app.whoami(mut ctx) or {
 		ctx.error('you are not logged in!')
 		return ctx.redirect('/login')
 	}
 
-	if user.admin || app.config.dev_mode {
-		sql app.db {
-			update User set muted = muted where id == user.id
-		} or {
+	to_mute := app.get_user_by_id(id) or {
+		ctx.error('no such user')
+		return ctx.redirect('/')
+	}
+
+	if user.admin {
+		if !app.set_muted(to_mute.id, muted) {
 			ctx.error('failed to change mute status')
-			eprintln('failed to update mute status for ${user} (${user.muted} -> ${muted})')
-			return ctx.redirect('/user/${user.username}')
+			return ctx.redirect('/user/${to_mute.username}')
 		}
-		return ctx.redirect('/user/${user.username}')
+		return ctx.redirect('/user/${to_mute.username}')
 	} else {
 		ctx.error('insufficient permissions!')
-		eprintln('insufficient perms to update mute status for ${user} (${user.muted} -> ${muted})')
-		return ctx.redirect('/user/${user.username}')
+		eprintln('insufficient perms to update mute status for ${to_mute} (${to_mute.muted} -> ${muted})')
+		return ctx.redirect('/user/${to_mute.username}')
 	}
 }
 
@@ -285,11 +269,8 @@ fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
 		theme = url.trim_space()
 	}
 
-	sql app.db {
-		update User set theme = theme where id == user.id
-	} or {
+	if !app.set_theme(user.id, theme) {
 		ctx.error('failed to change theme')
-		eprintln('failed to update theme for ${user} (${user.theme} -> ${theme})')
 		return ctx.redirect('/me')
 	}
 
@@ -309,11 +290,8 @@ fn (mut app App) api_user_set_pronouns(mut ctx Context, pronouns string) veb.Res
 		return ctx.redirect('/me')
 	}
 
-	sql app.db {
-		update User set pronouns = clean_pronouns where id == user.id
-	} or {
+	if !app.set_pronouns(user.id, clean_pronouns) {
 		ctx.error('failed to change pronouns')
-		eprintln('failed to update pronouns for ${user} (${user.pronouns} -> ${clean_pronouns})')
 		return ctx.redirect('/me')
 	}
 
@@ -333,10 +311,7 @@ fn (mut app App) api_user_set_bio(mut ctx Context, bio string) veb.Result {
 		return ctx.redirect('/me')
 	}
 
-	sql app.db {
-		update User set bio = clean_bio where id == user.id
-	} or {
-		ctx.error('failed to change bio')
+	if !app.set_bio(user.id, clean_bio) {
 		eprintln('failed to update bio for ${user} (${user.bio} -> ${clean_bio})')
 		return ctx.redirect('/me')
 	}

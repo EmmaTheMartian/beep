@@ -56,7 +56,7 @@
 @if viewing.bio != ''
 <div>
 	<h2>bio:</h2>
-	<p>@viewing.bio</p>
+	<pre id="bio">@viewing.bio</pre>
 </div>
 @end
 
@@ -105,6 +105,13 @@
 		@end
 	</form>
 </div>
+@end
+
+@if viewing.bio != ''
+<script src="/static/js/render_body.js"></script>
+<script>
+	render_body('bio')
+</script>
 @end
 
 @include 'partial/footer.html'

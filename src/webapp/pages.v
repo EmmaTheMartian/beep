@@ -1,4 +1,4 @@
-module main
+module webapp
 
 import veb
 import entity { User }
@@ -9,19 +9,19 @@ fn (mut app App) index(mut ctx Context) veb.Result {
 	recent_posts := app.get_recent_posts()
 	pinned_posts := app.get_pinned_posts()
 	motd := app.get_motd()
-	return $veb.html()
+	return $veb.html('../templates/index.html')
 }
 
 fn (mut app App) login(mut ctx Context) veb.Result {
 	ctx.title = 'login to ${app.config.instance.name}'
 	user := app.whoami(mut ctx) or { User{} }
-	return $veb.html()
+	return $veb.html('../templates/login.html')
 }
 
 fn (mut app App) register(mut ctx Context) veb.Result {
 	ctx.title = 'register for ${app.config.instance.name}'
 	user := app.whoami(mut ctx) or { User{} }
-	return $veb.html()
+	return $veb.html('../templates/register.html')
 }
 
 fn (mut app App) me(mut ctx Context) veb.Result {
@@ -39,13 +39,13 @@ fn (mut app App) settings(mut ctx Context) veb.Result {
 		return ctx.redirect('/login')
 	}
 	ctx.title = '${app.config.instance.name} - settings'
-	return $veb.html()
+	return $veb.html('../templates/settings.html')
 }
 
 fn (mut app App) admin(mut ctx Context) veb.Result {
 	ctx.title = '${app.config.instance.name} dashboard'
 	user := app.whoami(mut ctx) or { User{} }
-	return $veb.html()
+	return $veb.html('../templates/admin.html')
 }
 
 fn (mut app App) inbox(mut ctx Context) veb.Result {
@@ -55,7 +55,7 @@ fn (mut app App) inbox(mut ctx Context) veb.Result {
 	}
 	ctx.title = '${app.config.instance.name} inbox'
 	notifications := app.get_notifications_for(user.id)
-	return $veb.html()
+	return $veb.html('../templates/inbox.html')
 }
 
 fn (mut app App) logout(mut ctx Context) veb.Result {
@@ -64,7 +64,7 @@ fn (mut app App) logout(mut ctx Context) veb.Result {
 		return ctx.redirect('/login')
 	}
 	ctx.title = '${app.config.instance.name} logout'
-	return $veb.html()
+	return $veb.html('../templates/logout.html')
 }
 
 @['/user/:username']
@@ -75,7 +75,7 @@ fn (mut app App) user(mut ctx Context, username string) veb.Result {
 		return ctx.redirect('/')
 	}
 	ctx.title = '${app.config.instance.name} - ${user.get_name()}'
-	return $veb.html()
+	return $veb.html('../templates/user.html')
 }
 
 @['/post/:post_id']
@@ -99,7 +99,7 @@ fn (mut app App) post(mut ctx Context, post_id int) veb.Result {
 		}
 	}
 
-	return $veb.html()
+	return $veb.html('../templates/post.html')
 }
 
 @['/post/:post_id/edit']
@@ -117,7 +117,7 @@ fn (mut app App) edit(mut ctx Context, post_id int) veb.Result {
 		return ctx.redirect('/post/${post_id}')
 	}
 	ctx.title = '${app.config.instance.name} - editing ${post.title}'
-	return $veb.html()
+	return $veb.html('../templates/edit.html')
 }
 
 @['/post/:post_id/reply']
@@ -137,7 +137,7 @@ fn (mut app App) reply(mut ctx Context, post_id int) veb.Result {
 		ctx.error('no such post')
 		return ctx.redirect('/')
 	}
-	return $veb.html('templates/new_post.html')
+	return $veb.html('../templates/new_post.html')
 }
 
 @['/post/new']
@@ -150,7 +150,7 @@ fn (mut app App) new(mut ctx Context) veb.Result {
 	replying := false
 	replying_to := 0
 	replying_to_user := User{}
-	return $veb.html('templates/new_post.html')
+	return $veb.html('../templates/new_post.html')
 }
 
 @['/tag/:tag']
@@ -161,7 +161,7 @@ fn (mut app App) tag(mut ctx Context, tag string) veb.Result {
 	}
 	ctx.title = '${app.config.instance.name} - #${tag}'
 	offset := 0
-	return $veb.html()
+	return $veb.html('../templates/tag.html')
 }
 
 @['/tag/:tag/:offset']
@@ -171,5 +171,5 @@ fn (mut app App) tag_with_offset(mut ctx Context, tag string, offset int) veb.Re
 		return ctx.redirect('/login')
 	}
 	ctx.title = '${app.config.instance.name} - #${tag}'
-	return $veb.html('templates/tag.html')
+	return $veb.html('../templates/tag.html')
 }

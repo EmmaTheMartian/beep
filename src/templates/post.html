@@ -70,6 +70,7 @@
 		<input type="submit" value="delete">
 	</form>
 
+	@if user.admin
 	<form action="/api/post/pin" method="post">
 		<input
 			type="number"
@@ -84,6 +85,7 @@
 		>
 		<input type="submit" value="pin">
 	</form>
+	@end
 
 	</div>
 	@end

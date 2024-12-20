@@ -5,6 +5,7 @@ import veb
 import auth
 import entity
 import os
+import webapp { App, Context, StringValidator }
 
 fn init_db(db pg.DB) ! {
 	sql db {
@@ -18,7 +19,7 @@ fn init_db(db pg.DB) ! {
 }
 
 fn main() {
-	config := load_config_from(os.args[1])
+	config := webapp.load_config_from(os.args[1])
 
 	println('-> connecting to db...')
 	mut db := pg.connect(pg.Config{
