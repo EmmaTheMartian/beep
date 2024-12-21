@@ -61,8 +61,8 @@
 @end
 
 <div>
-	<h2>posts:</h2>
-	@for post in app.get_posts_from_user(viewing.id)
+	<h2>recent posts:</h2>
+	@for post in app.get_posts_from_user(viewing.id, 10)
 	@include 'components/post_small.html'
 	@end
 </div>

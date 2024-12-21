@@ -69,7 +69,16 @@ pub fn (app &DatabaseAccess) get_popular_posts() []Post {
 
 // get_posts_from_user returns a list of all posts from a user in descending
 // order by posting date.
-pub fn (app &DatabaseAccess) get_posts_from_user(user_id int) []Post {
+pub fn (app &DatabaseAccess) get_posts_from_user(user_id int, limit int) []Post {
+	posts := sql app.db {
+		select from Post where author_id == user_id order by posted_at desc limit limit
+	} or { [] }
+	return posts
+}
+
+// get_all_posts_from_user returns a list of all posts from a user in descending
+// order by posting date.
+pub fn (app &DatabaseAccess) get_all_posts_from_user(user_id int) []Post {
 	posts := sql app.db {
 		select from Post where author_id == user_id order by posted_at desc
 	} or { [] }

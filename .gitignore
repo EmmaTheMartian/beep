@@ -1,4 +1,4 @@
-# Binaries for programs and plugins
+# binaries
 main
 clockwork
 beep
@@ -7,27 +7,21 @@ beep
 *.so
 *.dylib
 *.dll
-
-# Ignore binary output folders
 bin/
 
-# Ignore common editor/system specific metadata
+# editor/system specific metadata
 .DS_Store
 .idea/
 .vscode/
 *.iml
 
-# ENV
+# secrets
+/config.real.maple
 .env
 
-# vweb and database
-*.db
-
-# Local V install
+# local v and clockwork install (from gitpod stuffs)
 /v/
-
-# Local Clockwork install
 /clockwork/
 
-# "Real" config (contains secrets and such)
-/config.real.maple
+# quick notes i keep while developing
+/stickynote.md
