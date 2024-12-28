@@ -3,6 +3,17 @@ module database
 import time
 import entity { Post, Like, LikeCache }
 
+// add_post adds a new post to the database, returns true if this succeeded and
+// false otherwise.
+pub fn (app &DatabaseAccess) add_post(post &Post) bool {
+	sql app.db {
+		insert post into Post
+	} or {
+		return false
+	}
+	return true
+}
+
 // get_post_by_id gets a post by its id, returns none if it does not exist.
 pub fn (app &DatabaseAccess) get_post_by_id(id int) ?Post {
 	posts := sql app.db {
@@ -83,4 +94,39 @@ pub fn (app &DatabaseAccess) get_all_posts_from_user(user_id int) []Post {
 		select from Post where author_id == user_id order by posted_at desc
 	} or { [] }
 	return posts
+}
+
+// pin_post pins the given post, returns true if this succeeds and false
+// otherwise.
+pub fn (app &DatabaseAccess) pin_post(post_id int) bool {
+	sql app.db {
+		update Post set pinned = true where id == post_id
+	} or {
+		return false
+	}
+	return true
+}
+
+// update_post updates the given post's title and body with the given title and
+// body, returns true if this succeeds and false otherwise.
+pub fn (app &DatabaseAccess) update_post(post_id int, new_title string, new_body string) bool {
+	sql app.db {
+		update Post set body = new_body, title = new_title where id == post_id
+	} or {
+		return false
+	}
+	return true
+}
+
+// delete_post deletes the given post and all likes associated with it, returns
+// true if this succeeds and false otherwise.
+pub fn (app &DatabaseAccess) delete_post(id int) bool {
+	sql app.db {
+		delete from Post where id == id
+		delete from Like where post_id == id
+		delete from LikeCache where post_id == id
+	} or {
+		return false
+	}
+	return true
 }

@@ -1,6 +1,6 @@
 module database
 
-import entity { User, Notification, Like, Post }
+import entity { User, Notification, Like, LikeCache, Post }
 
 // new_user creates a new user and returns their struct after creation.
 pub fn (app &DatabaseAccess) new_user(user User) ?User {
@@ -171,4 +171,38 @@ pub fn (app &DatabaseAccess) does_user_like_or_dislike_post(user_id int, post_id
 		eprintln('a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
 	}
 	return likes.len == 1
+}
+
+// delete_user deletes the given user and their data, returns true if this
+// succeeded and false otherwise.
+pub fn (app &DatabaseAccess) delete_user(user_id int) bool {
+	sql app.db {
+		delete from User where id == user_id
+		delete from Like where user_id == user_id
+		delete from Notification where user_id == user_id
+	} or {
+		return false
+	}
+
+	// delete posts and their likes
+	posts_from_this_user := sql app.db {
+		select from Post where author_id == id
+	} or { [] }
+
+	for post in posts_from_this_user {
+		sql app.db {
+			delete from Like where post_id == post.id
+			delete from LikeCache where post_id == post.id
+		} or {
+			eprintln('failed to delete like cache for post during user deletion: ${post.id}')
+		}
+	}
+
+	sql app.db {
+		delete from Post where author_id == id
+	} or {
+		eprintln('failed to delete posts by deleting user: ${user_id}')
+	}
+
+	return true
 }
