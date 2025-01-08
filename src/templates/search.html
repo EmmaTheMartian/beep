@@ -1,0 +1,55 @@
+@include 'partial/header.html'
+
+<script src="/static/js/user_utils.js"></script>
+<script src="/static/js/search.js"></script>
+
+<h1>search</h1>
+
+<div>
+	<input type="text" name="query" id="query">
+	<button id="search">search</button>
+</div>
+
+<br>
+
+<div id="results">
+</div>
+
+<script>
+	const query = document.getElementById("query")
+	const results = document.getElementById("results")
+
+	document.getElementById("search").addEventListener("click", async () => {
+		results.innerHTML = '' // yeet the children!
+		const search_results = await search(query.value, 10, 0)
+		if (search_results.length >= 0) {
+			for (result of search_results) {
+				// same as components/post_mini.html except js
+				const element = document.createElement('div')
+				element.classList.add('post', 'post-mini')
+				const p = document.createElement('p')
+
+				const user_link = document.createElement('a')
+				user_link.href = '/user/' + result.author.username
+				const user_text = document.createElement('strong')
+				user_text.innerText = get_display_name(result.author)
+				user_link.appendChild(user_text)
+				p.appendChild(user_link)
+
+				p.innerText += ': '
+
+				const post_link = document.createElement('a')
+				post_link.href = '/post/' + result.post.id
+				post_link.innerText = result.post.title
+				p.appendChild(post_link)
+
+				element.appendChild(p)
+				results.appendChild(element)
+			}
+		} else {
+			results.innerText = 'No results!'
+		}
+	})
+</script>
+
+@include 'partial/footer.html'

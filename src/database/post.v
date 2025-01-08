@@ -1,7 +1,7 @@
 module database
 
 import time
-import entity { Post, Like, LikeCache }
+import entity { Post, User, Like, LikeCache }
 
 // add_post adds a new post to the database, returns true if this succeeded and
 // false otherwise.
@@ -129,4 +129,44 @@ pub fn (app &DatabaseAccess) delete_post(id int) bool {
 		return false
 	}
 	return true
+}
+
+////// searching //////
+
+// PostSearchResult represents a search result for a post.
+pub struct PostSearchResult {
+pub mut:
+	post   Post
+	author User
+}
+
+@[inline]
+pub fn PostSearchResult.from_post(app &DatabaseAccess, post &Post) PostSearchResult {
+	return PostSearchResult{
+		post: post
+		author: app.get_user_by_id(post.author_id) or { app.get_unknown_user() }
+	}
+}
+
+@[inline]
+pub fn PostSearchResult.from_post_list(app &DatabaseAccess, posts []Post) []PostSearchResult {
+	mut results := []PostSearchResult{
+		cap: posts.len,
+		len: posts.len
+	}
+	for index, post in posts {
+		results[index] = PostSearchResult.from_post(app, post)
+	}
+	return results
+}
+
+// search_for_post searches for posts matching the given query.
+// todo: query options/filters, such as user:beep, !excluded-text, etc
+pub fn (app &DatabaseAccess) search_for_posts(query string, limit int, offset int) []PostSearchResult {
+	println('searching, q=${query},l=${limit},o=${offset}')
+	posts := sql app.db {
+		select from Post where title like '%${query}%' order by posted_at desc limit limit offset offset
+	} or { [] }
+	println('search results: ${posts.len}')
+	return PostSearchResult.from_post_list(app, posts)
 }

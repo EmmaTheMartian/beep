@@ -186,7 +186,7 @@ pub fn (app &DatabaseAccess) delete_user(user_id int) bool {
 
 	// delete posts and their likes
 	posts_from_this_user := sql app.db {
-		select from Post where author_id == id
+		select from Post where author_id == user_id
 	} or { [] }
 
 	for post in posts_from_this_user {
@@ -199,7 +199,7 @@ pub fn (app &DatabaseAccess) delete_user(user_id int) bool {
 	}
 
 	sql app.db {
-		delete from Post where author_id == id
+		delete from Post where author_id == user_id
 	} or {
 		eprintln('failed to delete posts by deleting user: ${user_id}')
 	}

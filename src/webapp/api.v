@@ -3,6 +3,7 @@ module webapp
 import veb
 import auth
 import entity { Like, LikeCache, Post, Site, User, Notification }
+import database { PostSearchResult }
 
 ////// user //////
 
@@ -602,6 +603,14 @@ fn (mut app App) api_post_pin(mut ctx Context, id int) veb.Result {
 	}
 }
 
+@['/api/post/get/<id>'; get]
+fn (mut app App) api_post_get_post(mut ctx Context, id int) veb.Result {
+	post := app.get_post_by_id(id) or {
+		return ctx.text('no such post')
+	}
+	return ctx.json[Post](post)
+}
+
 ////// site //////
 
 @['/api/site/set_motd'; post]
@@ -624,4 +633,17 @@ fn (mut app App) api_site_set_motd(mut ctx Context, motd string) veb.Result {
 		eprintln('insufficient perms to set motd to: ${motd} (${user.id})')
 		return ctx.redirect('/')
 	}
+}
+
+////// Misc //////
+
+pub const search_hard_limit := 50
+
+@['/api/search'; get]
+fn (mut app App) api_search(mut ctx Context, query string, limit int, offset int) veb.Result {
+	if limit >= search_hard_limit {
+		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
+	}
+	posts := app.search_for_posts(query, limit, offset)
+	return ctx.json[[]PostSearchResult](posts)
 }

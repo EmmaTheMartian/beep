@@ -173,3 +173,13 @@ fn (mut app App) tag_with_offset(mut ctx Context, tag string, offset int) veb.Re
 	ctx.title = '${app.config.instance.name} - #${tag}'
 	return $veb.html('../templates/tag.html')
 }
+
+@['/search']
+fn (mut app App) search(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} - search'
+	return $veb.html('../templates/search.html')
+}

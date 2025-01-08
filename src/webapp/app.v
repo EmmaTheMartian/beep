@@ -71,20 +71,6 @@ pub fn (app &App) whoami(mut ctx Context) ?User {
 	}
 }
 
-// get_unknown_user returns a user representing an unknown user
-pub fn (app &App) get_unknown_user() User {
-	return User{
-		username: 'unknown'
-	}
-}
-
-// get_unknown_post returns a post representing an unknown post
-pub fn (app &App) get_unknown_post() Post {
-	return Post{
-		title: 'unknown'
-	}
-}
-
 // logged_in_as returns true if the user is logged in as the provided user id.
 pub fn (app &App) logged_in_as(mut ctx Context, id int) bool {
 	if !ctx.is_logged_in() {
