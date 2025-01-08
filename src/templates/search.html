@@ -12,16 +12,33 @@
 
 <br>
 
+<div id="pages">
+</div>
+
 <div id="results">
 </div>
 
 <script>
-	const query = document.getElementById("query")
-	const results = document.getElementById("results")
+	const params = new URLSearchParams(window.location.search)
 
-	document.getElementById("search").addEventListener("click", async () => {
+	const pages = document.getElementById('pages')
+	const results = document.getElementById('results')
+
+	const query = document.getElementById('query')
+	if (query.value == '' && params.get('q')) {
+		query.value = params.get('q')
+	}
+
+	let offset = params.get('offset')
+	if (!offset) {
+		offset = 0
+	}
+
+	document.getElementById('search').addEventListener('click', async () => {
 		results.innerHTML = '' // yeet the children!
-		const search_results = await search(query.value, 10, 0)
+		pages.innerHTML = '' // yeet more children!
+
+		const search_results = await search(query.value, 10, Number(offset.value))
 		if (search_results.length >= 0) {
 			for (result of search_results) {
 				// same as components/post_mini.html except js
@@ -46,8 +63,23 @@
 				element.appendChild(p)
 				results.appendChild(element)
 			}
+
+			// set up pagination
+			if (offset > 0) {
+				const back_link = document.createElement('a')
+				// we escape the $ here because otherwise V will try to perform replacements at compile-time.
+				//todo: report this, this behaviour should be changed or at least looked into further.
+				back_link.href = '/search?q=' + query.value + '&limit=10&offset=' + Math.min(0, offset.value - 10)
+				back_link.innerText = '<-'
+				pages.appendChild(back_link)
+
+				const next_link = document.createElement('a')
+				next_link.href = '/search?q=' + query.value + '&limit=10&offset=' + (offset.value + 10)
+				next_link.innerText = '->'
+				pages.appendChild(next_link)
+			}
 		} else {
-			results.innerText = 'No results!'
+			results.innerText = 'no results!'
 		}
 	})
 </script>

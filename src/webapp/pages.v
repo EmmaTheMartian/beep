@@ -175,7 +175,7 @@ fn (mut app App) tag_with_offset(mut ctx Context, tag string, offset int) veb.Re
 }
 
 @['/search']
-fn (mut app App) search(mut ctx Context) veb.Result {
+fn (mut app App) search(mut ctx Context, q string, offset int) veb.Result {
 	user := app.whoami(mut ctx) or {
 		ctx.error('not logged in')
 		return ctx.redirect('/login')
