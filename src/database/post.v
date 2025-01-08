@@ -164,6 +164,7 @@ pub fn PostSearchResult.from_post_list(app &DatabaseAccess, posts []Post) []Post
 // todo: query options/filters, such as user:beep, !excluded-text, etc
 pub fn (app &DatabaseAccess) search_for_posts(query string, limit int, offset int) []PostSearchResult {
 	println('searching, q=${query},l=${limit},o=${offset}')
+	//todo: app.db.q_strings('select from Post where title like \'%${query}%\' or body like \'%${query}%\' order by posted_at desc limit limit offset offset')
 	posts := sql app.db {
 		select from Post where title like '%${query}%' order by posted_at desc limit limit offset offset
 	} or { [] }

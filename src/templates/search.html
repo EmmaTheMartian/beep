@@ -53,7 +53,7 @@
 				user_link.appendChild(user_text)
 				p.appendChild(user_link)
 
-				p.innerText += ': '
+				p.innerHTML += ': '
 
 				const post_link = document.createElement('a')
 				post_link.href = '/post/' + result.post.id
