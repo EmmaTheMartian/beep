@@ -52,7 +52,7 @@ pub fn User.from_row(row pg.Row) User {
 		id: util.or_throw[string](row.vals[0]).int()
 		username: util.or_throw[string](row.vals[1])
 		nickname: if row.vals[2] == none { ?string(none) } else {
-			util.or_throw[string](row.vals[3])
+			util.or_throw[string](row.vals[2])
 		}
 		password: 'haha lol, nope'
 		password_salt: 'haha lol, nope'

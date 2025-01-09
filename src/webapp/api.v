@@ -5,6 +5,10 @@ import auth
 import entity { Like, LikeCache, Post, Site, User, Notification }
 import database { PostSearchResult }
 
+// search_hard_limit is the maximum limit for a search query, used to prevent
+// people from requesting searches with huge limits and straining the SQL server
+pub const search_hard_limit := 50
+
 ////// user //////
 
 @['/api/user/register'; post]
@@ -402,6 +406,15 @@ fn (mut app App) api_user_delete(mut ctx Context, id int) veb.Result {
 	return ctx.redirect('/')
 }
 
+@['/api/user/search'; get]
+fn (mut app App) api_user_search(mut ctx Context, query string, limit int, offset int) veb.Result {
+	if limit >= search_hard_limit {
+		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
+	}
+	users := app.search_for_users(query, limit, offset)
+	return ctx.json[[]User](users)
+}
+
 ////// post //////
 
 @['/api/post/new_post'; post]
@@ -611,6 +624,15 @@ fn (mut app App) api_post_get_post(mut ctx Context, id int) veb.Result {
 	return ctx.json[Post](post)
 }
 
+@['/api/post/search'; get]
+fn (mut app App) api_post_search(mut ctx Context, query string, limit int, offset int) veb.Result {
+	if limit >= search_hard_limit {
+		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
+	}
+	posts := app.search_for_posts(query, limit, offset)
+	return ctx.json[[]PostSearchResult](posts)
+}
+
 ////// site //////
 
 @['/api/site/set_motd'; post]
@@ -633,17 +655,4 @@ fn (mut app App) api_site_set_motd(mut ctx Context, motd string) veb.Result {
 		eprintln('insufficient perms to set motd to: ${motd} (${user.id})')
 		return ctx.redirect('/')
 	}
-}
-
-////// Misc //////
-
-pub const search_hard_limit := 50
-
-@['/api/search'; get]
-fn (mut app App) api_search(mut ctx Context, query string, limit int, offset int) veb.Result {
-	if limit >= search_hard_limit {
-		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
-	}
-	posts := app.search_for_posts(query, limit, offset)
-	return ctx.json[[]PostSearchResult](posts)
 }
