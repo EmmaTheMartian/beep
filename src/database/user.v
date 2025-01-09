@@ -206,3 +206,24 @@ pub fn (app &DatabaseAccess) delete_user(user_id int) bool {
 
 	return true
 }
+
+// search_for_users searches for posts matching the given query.
+// todo: query options/filters, such as created-after:<date>, created-before:<date>, etc
+pub fn (app &DatabaseAccess) search_for_users(query string, limit int, offset int) []User {
+	sql_query := "\
+	SELECT *, CASE
+		WHEN username LIKE '%${query}%' THEN 1
+		WHEN nickname LIKE '%${query}%' THEN 2
+		END AS priority
+	FROM \"User\"
+	WHERE username LIKE '%${query}%' OR nickname LIKE '%${query}%'
+	ORDER BY priority ASC LIMIT ${limit} OFFSET ${offset}"
+
+	queried_users := app.db.q_strings(sql_query) or {
+		eprintln('search_for_users error in app.db.q_strings: ${err}')
+		[]
+	}
+
+	users := queried_users.map(|it| User.from_row(it))
+	return users
+}

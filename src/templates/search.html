@@ -29,8 +29,13 @@
 		query.value = params.get('q')
 	}
 
+	let limit = params.get('limit')
+	if (!limit) {
+		limit = 10
+	}
+
 	let offset = params.get('offset')
-	if (!offset) {
+	if (!limit) {
 		offset = 0
 	}
 
@@ -38,7 +43,9 @@
 		results.innerHTML = '' // yeet the children!
 		pages.innerHTML = '' // yeet more children!
 
-		const search_results = await search(query.value, 10, Number(offset.value))
+		console.log('search: ', query.value, limit, offset)
+
+		const search_results = await search(query.value, limit, offset)
 		if (search_results.length >= 0) {
 			for (result of search_results) {
 				// same as components/post_mini.html except js
@@ -66,16 +73,32 @@
 
 			// set up pagination
 			if (offset > 0) {
-				const back_link = document.createElement('a')
+				// creates a separator
+				function sep() {
+					const span = document.createElement('span')
+					span.innerText = ' - '
+					pages.appendChild(span)
+				}
+
+				const first_link = document.createElement('a')
 				// we escape the $ here because otherwise V will try to perform replacements at compile-time.
 				//todo: report this, this behaviour should be changed or at least looked into further.
-				back_link.href = '/search?q=' + query.value + '&limit=10&offset=' + Math.min(0, offset.value - 10)
-				back_link.innerText = '<-'
+				first_link.href = '/search?q=' + query.value + '&limit=' + limit + '&offset=0'
+				first_link.innerText = '0'
+				pages.appendChild(first_link)
+
+				sep()
+
+				const back_link = document.createElement('a')
+				back_link.href = '/search?q=' + query.value + '&limit=' + limit + '&offset=' + Math.min(0, offset - 10)
+				back_link.innerText = '<'
 				pages.appendChild(back_link)
 
+				sep()
+
 				const next_link = document.createElement('a')
-				next_link.href = '/search?q=' + query.value + '&limit=10&offset=' + (offset.value + 10)
-				next_link.innerText = '->'
+				next_link.href = '/search?q=' + query.value + '&limit=' + limit + '&offset=' + (offset + 10)
+				next_link.innerText = '>'
 				pages.appendChild(next_link)
 			}
 		} else {

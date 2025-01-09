@@ -18,7 +18,7 @@ pub mut:
 	posted_at time.Time = time.now()
 }
 
-// Post.from_row creates a post from the given database row.
+// Post.from_row creates a post object from the given database row.
 // see src/database/post.v#search_for_posts for usage.
 @[inline]
 pub fn Post.from_row(row pg.Row) Post {
