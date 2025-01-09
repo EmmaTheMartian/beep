@@ -38,6 +38,8 @@
 - [ ] user:per-user post pins
 	- could be used as an alternative for a bio to include more information perhaps
 - [ ] site:rss feed?
+- [ ] site:webhooks
+	- could be used so that a github webhook can send a message when a new commit is pushed to beep!
 
 ## done
 
