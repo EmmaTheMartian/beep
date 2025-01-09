@@ -163,11 +163,20 @@ pub fn PostSearchResult.from_post_list(app &DatabaseAccess, posts []Post) []Post
 // search_for_post searches for posts matching the given query.
 // todo: query options/filters, such as user:beep, !excluded-text, etc
 pub fn (app &DatabaseAccess) search_for_posts(query string, limit int, offset int) []PostSearchResult {
-	println('searching, q=${query},l=${limit},o=${offset}')
-	//todo: app.db.q_strings('select from Post where title like \'%${query}%\' or body like \'%${query}%\' order by posted_at desc limit limit offset offset')
-	posts := sql app.db {
-		select from Post where title like '%${query}%' order by posted_at desc limit limit offset offset
-	} or { [] }
-	println('search results: ${posts.len}')
+	sql_query := "\
+	SELECT *, CASE
+		WHEN title LIKE '%${query}%' THEN 1
+		WHEN body LIKE '%${query}%' THEN 2
+		END AS priority
+	FROM \"Post\"
+	WHERE title LIKE '%${query}%' OR body LIKE '%${query}%'
+	ORDER BY priority ASC LIMIT ${limit} OFFSET ${offset}"
+
+	queried_posts := app.db.q_strings(sql_query) or {
+		eprintln('search_for_posts error in app.db.q_strings: ${err}')
+		[]
+	}
+
+	posts := queried_posts.map(|it| Post.from_row(it))
 	return PostSearchResult.from_post_list(app, posts)
 }
