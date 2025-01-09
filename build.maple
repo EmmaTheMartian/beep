@@ -54,3 +54,10 @@ task:run.real = {
 	category = 'run'
 	run = '${v} -d veb_livereload watch run ${v_main} config.real.maple'
 }
+
+task:cloc = {
+	description = 'Get the lines of code for beep!'
+	category = 'misc'
+	//todo: contribute vlang support to cloc and use that here instead of it seeing all of our v code as verilog code
+	run = 'cloc ./src/'
+}
