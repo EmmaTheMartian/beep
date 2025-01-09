@@ -1,0 +1,173 @@
+@include 'partial/header.html'
+
+<script src="/static/js/user_utils.js"></script>
+<script src="/static/js/search.js"></script>
+
+<h1>search</h1>
+
+<div>
+	<input type="text" name="query" id="query">
+	<div>
+		<p>search for:</p>
+		<input type="radio" name="search-for" id="search-for-posts" value="posts" checked aria-checked>
+		<label for="search-for-posts">posts</label>
+		<input type="radio" name="search-for" id="search-for-users" value="users">
+		<label for="search-for-users">users</label>
+	</div>
+	<br>
+	<button id="search">search</button>
+</div>
+
+<br>
+
+<div id="pages">
+</div>
+
+<div id="results">
+</div>
+
+<script>
+	const params = new URLSearchParams(window.location.search)
+
+	const pages = document.getElementById('pages')
+	const results = document.getElementById('results')
+
+	const query = document.getElementById('query')
+	if (query.value == '' && params.get('q')) {
+		query.value = params.get('q')
+	}
+
+	let limit = params.get('limit')
+	if (!limit) {
+		limit = 10
+	}
+
+	let offset = params.get('offset')
+	if (!limit) {
+		offset = 0
+	}
+
+	const add_post_result = result => {
+		// same as components/post_mini.html except js
+		const element = document.createElement('div')
+		element.classList.add('post', 'post-mini')
+		const p = document.createElement('p')
+
+		const user_link = document.createElement('a')
+		user_link.href = '/user/' + result.author.username
+		const user_text = document.createElement('strong')
+		user_text.innerText = get_display_name(result.author)
+		user_link.appendChild(user_text)
+		p.appendChild(user_link)
+
+		p.innerHTML += ': '
+
+		const post_link = document.createElement('a')
+		post_link.href = '/post/' + result.post.id
+		post_link.innerText = result.post.title
+		p.appendChild(post_link)
+
+		element.appendChild(p)
+		results.appendChild(element)
+	}
+
+	const add_user_result = user => {
+		const element = document.createElement('div')
+		const p = document.createElement('p')
+		const user_link = document.createElement('a')
+		user_link.href = '/user/' + user.username
+		user_link.innerText = get_display_name(user)
+		p.appendChild(user_link)
+		element.appendChild(p)
+		results.appendChild(element)
+	}
+
+	const add_pages = () => {
+		// creates a separator
+		const sep = () => {
+			const span = document.createElement('span')
+			span.innerText = ' - '
+			pages.appendChild(span)
+		}
+
+		const first_link = document.createElement('a')
+		// we escape the $ here because otherwise V will try to perform replacements at compile-time.
+		//todo: report this, this behaviour should be changed or at least looked into further.
+		first_link.href = '/search?q=' + query.value + '&limit=' + limit + '&offset=0'
+		first_link.innerText = '0'
+		pages.appendChild(first_link)
+
+		sep()
+
+		const back_link = document.createElement('a')
+		back_link.href = '/search?q=' + query.value + '&limit=' + limit + '&offset=' + Math.min(0, offset - 10)
+		back_link.innerText = '<'
+		pages.appendChild(back_link)
+
+		sep()
+
+		const next_link = document.createElement('a')
+		next_link.href = '/search?q=' + query.value + '&limit=' + limit + '&offset=' + (offset + 10)
+		next_link.innerText = '>'
+		pages.appendChild(next_link)
+	}
+
+	document.getElementById('search').addEventListener('click', async () => {
+		results.innerHTML = '' // yeet the children!
+		pages.innerHTML = '' // yeet more children!
+
+		var search_for
+		for (const radio of document.getElementsByName('search-for')) {
+			if (radio.checked) {
+				search_for = radio.value
+				break
+			}
+		}
+		if (search_for == undefined) {
+			alert('please select either "users" or "posts" to search for.')
+			return
+		}
+
+		console.log('search: ', query.value, limit, offset)
+
+		var search_results
+		if (search_for == 'users') {
+			search_results = await search_users(query.value, limit, offset)
+		} else if (search_for == 'posts') {
+			search_results = await search_posts(query.value, limit, offset)
+		} else {
+			// this should never happen
+			alert('something wrong occured while searching, please report this (01)')
+			return
+		}
+
+		console.log(search_results)
+
+		if (search_results.length >= 0) {
+			// i iterate inside the if statements so that i do not have to perform a redundant
+			// string comparison for every single result.
+			if (search_for == 'users') {
+				for (result of search_results) {
+					add_user_result(result)
+				}
+			} else if (search_for == 'posts') {
+				for (result of search_results) {
+					add_post_result(result)
+				}
+			} else {
+				// this should never happen
+				alert('something wrong occured while searching, please report this (02)')
+				return
+			}
+
+			// set up pagination, but only if we actually have pages to display
+			if (offset > 0) {
+				add_pages()
+			}
+		} else {
+			results.innerText = 'no results!'
+		}
+	})
+</script>
+
+@include 'partial/footer.html'

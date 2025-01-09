@@ -22,6 +22,11 @@
 <body>
 
 	<header>
+		@if ctx.is_logged_in()
+		<a href="/me">@@@user.get_name()</a>
+		-
+		@end
+
 		@if app.config.dev_mode
 		<span><strong>dev mode</strong></span>
 		-
@@ -31,8 +36,6 @@
 		-
 
 		@if ctx.is_logged_in()
-		<a href="/me">profile</a>
-		-
 		<a href="/inbox">inbox@{app.get_notification_count_for_frontend(user.id, 99)}</a>
 		@else
 		<a href="/login">log in</a>

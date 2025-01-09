@@ -2,6 +2,19 @@ module database
 
 import entity { Like, LikeCache }
 
+// add_like adds a like to the database, returns true if this succeeds and false
+// otherwise.
+pub fn (app &DatabaseAccess) add_like(like &Like) bool {
+	sql app.db {
+		insert like into Like
+		// yeet the old cached like value
+		delete from LikeCache where post_id == like.post_id
+	} or {
+		return false
+	}
+	return true
+}
+
 // get_net_likes_for_post returns the net likes of the given post.
 pub fn (app &DatabaseAccess) get_net_likes_for_post(post_id int) int {
 	// check cache
@@ -42,4 +55,17 @@ pub fn (app &DatabaseAccess) get_net_likes_for_post(post_id int) int {
 	}
 
 	return likes
+}
+
+// unlike_post removes a (dis)like from the given post, returns true if this
+// succeeds and false otherwise.
+pub fn (app &DatabaseAccess) unlike_post(post_id int, user_id int) bool {
+	sql app.db {
+		delete from Like where user_id == user_id && post_id == post_id
+		// yeet the old cached like value
+		delete from LikeCache where post_id == post_id
+	} or {
+		return false
+	}
+	return true
 }

@@ -9,3 +9,7 @@ helped me design beep!
 ## database design
 
 - https://stackoverflow.com/questions/59505855/liked-posts-design-specifics
+
+## sql
+
+- https://stackoverflow.com/questions/11144394/order-sql-by-strongest-like

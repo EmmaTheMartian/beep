@@ -4,10 +4,25 @@
 
 ## in-progress
 
-- [ ] post:embedded links (links added to a post will be embedded into the post
-as images, music links, etc)
-	- should have special handling for spotify, apple music, youtube,
-	discord, and other common links. we want those ones to look fancy!
+- [x] post:search for posts
+	- [ ] filters:
+		```
+		created-at:<date>
+		created-after:<date>
+		created-before:<date>
+		is:pinned
+		has-tag:<tag>
+		posted-by:<user>
+		!excluded-query
+		```
+- [x] user:search for users
+	- [ ] filters:
+		```
+		created-at:<date>
+		created-after:<date>
+		created-before:<date>
+		is:admin
+		```
 
 ## planing
 
@@ -15,8 +30,7 @@ as images, music links, etc)
 > however, i will not be fixing it, because it is funny.
 
 - [ ] post:saving (add the post to a list of saved posts that a user can view later)
-- [ ] post:search for posts
-- [ ] user:search for users
+- [ ] post:add more embedded link handling! (discord, github, gitlab, codeberg, etc)
 - [ ] user:follow other users (send notifications on new posts)
 
 ## ideas
@@ -40,6 +54,10 @@ as images, music links, etc)
 - [x] post:editing
 - [x] post:replies
 - [x] post:tags ('hashtags')
+- [x] post:embedded links (links added to a post will be embedded into the post
+as images, music links, etc)
+	- should have special handling for spotify, apple music, youtube,
+	discord, and other common links. we want those ones to look fancy!
 - [x] site:message of the day (admins can add a welcome message displayed on index.html)
 
 ## graveyard

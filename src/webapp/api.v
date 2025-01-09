@@ -3,6 +3,11 @@ module webapp
 import veb
 import auth
 import entity { Like, LikeCache, Post, Site, User, Notification }
+import database { PostSearchResult }
+
+// search_hard_limit is the maximum limit for a search query, used to prevent
+// people from requesting searches with huge limits and straining the SQL server
+pub const search_hard_limit := 50
 
 ////// user //////
 
@@ -329,16 +334,25 @@ fn (mut app App) api_user_get_name(mut ctx Context, username string) veb.Result 
 
 @['/api/user/notification/clear']
 fn (mut app App) api_user_notification_clear(mut ctx Context, id int) veb.Result {
-	if !ctx.is_logged_in() {
+	user := app.whoami(mut ctx) or {
 		ctx.error('you are not logged in!')
 		return ctx.redirect('/login')
 	}
-	sql app.db {
-		delete from Notification where id == id
-	} or {
-		ctx.error('failed to delete notification')
-		return ctx.redirect('/inbox')
+
+	if notification := app.get_notification_by_id(id) {
+		if notification.user_id != user.id {
+			ctx.error('no such notification for user')
+			return ctx.redirect('/inbox')
+		} else {
+			if !app.delete_notification(id) {
+				ctx.error('failed to delete notification')
+				return ctx.redirect('/inbox')
+			}
+		}
+	} else {
+		ctx.error('no such notification for user')
 	}
+
 	return ctx.redirect('/inbox')
 }
 
@@ -348,9 +362,7 @@ fn (mut app App) api_user_notification_clear_all(mut ctx Context) veb.Result {
 		ctx.error('you are not logged in!')
 		return ctx.redirect('/login')
 	}
-	sql app.db {
-		delete from Notification where user_id == user.id
-	} or {
+	if !app.delete_notifications_for_user(user.id) {
 		ctx.error('failed to delete notifications')
 		return ctx.redirect('/inbox')
 	}
@@ -368,33 +380,9 @@ fn (mut app App) api_user_delete(mut ctx Context, id int) veb.Result {
 
 	if user.admin || user.id == id {
 		// yeet
-		sql app.db {
-			delete from User where id == id
-			delete from Like where user_id == id
-			delete from Notification where user_id == id
-		} or {
+		if !app.delete_user(user.id) {
 			ctx.error('failed to delete user: ${id}')
 			return ctx.redirect('/')
-		}
-
-		// delete posts and their likes
-		posts_from_this_user := sql app.db {
-			select from Post where author_id == id
-		} or { [] }
-
-		for post in posts_from_this_user {
-			sql app.db {
-				delete from Like where post_id == post.id
-				delete from LikeCache where post_id == post.id
-			} or {
-				eprintln('failed to delete like cache for post during user deletion: ${post.id}')
-			}
-		}
-
-		sql app.db {
-			delete from Post where author_id == id
-		} or {
-			eprintln('failed to delete posts by deleting user: ${user.id}')
 		}
 
 		app.auth.delete_tokens_for_user(id) or {
@@ -416,6 +404,15 @@ fn (mut app App) api_user_delete(mut ctx Context, id int) veb.Result {
 	}
 
 	return ctx.redirect('/')
+}
+
+@['/api/user/search'; get]
+fn (mut app App) api_user_search(mut ctx Context, query string, limit int, offset int) veb.Result {
+	if limit >= search_hard_limit {
+		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
+	}
+	users := app.search_for_users(query, limit, offset)
+	return ctx.json[[]User](users)
 }
 
 ////// post //////
@@ -459,9 +456,7 @@ fn (mut app App) api_post_new_post(mut ctx Context, replying_to int, title strin
 		post.replying_to = replying_to
 	}
 
-	sql app.db {
-		insert post into Post
-	} or {
+	if !app.add_post(post) {
 		ctx.error('failed to post!')
 		println('failed to post: ${post} from user ${user.id}')
 		return ctx.redirect('/post/new')
@@ -490,10 +485,7 @@ fn (mut app App) api_post_delete(mut ctx Context, id int) veb.Result {
 	}
 
 	if user.admin || user.id == post.author_id {
-		sql app.db {
-			delete from Post where id == id
-			delete from Like where post_id == id
-		} or {
+		if !app.delete_post(post.id) {
 			ctx.error('failed to delete post')
 			eprintln('failed to delete post: ${id}')
 			return ctx.redirect('/')
@@ -514,11 +506,7 @@ fn (mut app App) api_post_like(mut ctx Context, id int) veb.Result {
 	post := app.get_post_by_id(id) or { return ctx.server_error('post does not exist') }
 
 	if app.does_user_like_post(user.id, post.id) {
-		sql app.db {
-			delete from Like where user_id == user.id && post_id == post.id
-			// yeet the old cached like value
-			delete from LikeCache where post_id == post.id
-		} or {
+		if !app.unlike_post(post.id, user.id) {
 			eprintln('user ${user.id} failed to unlike post ${id}')
 			return ctx.server_error('failed to unlike post')
 		}
@@ -526,9 +514,7 @@ fn (mut app App) api_post_like(mut ctx Context, id int) veb.Result {
 	} else {
 		// remove the old dislike, if it exists
 		if app.does_user_dislike_post(user.id, post.id) {
-			sql app.db {
-				delete from Like where user_id == user.id && post_id == post.id
-			} or {
+			if !app.unlike_post(post.id, user.id) {
 				eprintln('user ${user.id} failed to remove dislike on post ${id} when liking it')
 			}
 		}
@@ -538,11 +524,7 @@ fn (mut app App) api_post_like(mut ctx Context, id int) veb.Result {
 			post_id: post.id
 			is_like: true
 		}
-		sql app.db {
-			insert like into Like
-			// yeet the old cached like value
-			delete from LikeCache where post_id == post.id
-		} or {
+		if !app.add_like(like) {
 			eprintln('user ${user.id} failed to like post ${id}')
 			return ctx.server_error('failed to like post')
 		}
@@ -557,21 +539,15 @@ fn (mut app App) api_post_dislike(mut ctx Context, id int) veb.Result {
 	post := app.get_post_by_id(id) or { return ctx.server_error('post does not exist') }
 
 	if app.does_user_dislike_post(user.id, post.id) {
-		sql app.db {
-			delete from Like where user_id == user.id && post_id == post.id
-			// yeet the old cached like value
-			delete from LikeCache where post_id == post.id
-		} or {
-			eprintln('user ${user.id} failed to unlike post ${id}')
-			return ctx.server_error('failed to unlike post')
+		if !app.unlike_post(post.id, user.id) {
+			eprintln('user ${user.id} failed to undislike post ${id}')
+			return ctx.server_error('failed to undislike post')
 		}
 		return ctx.ok('undisliked post')
 	} else {
 		// remove the old like, if it exists
 		if app.does_user_like_post(user.id, post.id) {
-			sql app.db {
-				delete from Like where user_id == user.id && post_id == post.id
-			} or {
+			if !app.unlike_post(post.id, user.id) {
 				eprintln('user ${user.id} failed to remove like on post ${id} when disliking it')
 			}
 		}
@@ -581,11 +557,7 @@ fn (mut app App) api_post_dislike(mut ctx Context, id int) veb.Result {
 			post_id: post.id
 			is_like: false
 		}
-		sql app.db {
-			insert like into Like
-			// yeet the old cached like value
-			delete from LikeCache where post_id == post.id
-		} or {
+		if !app.add_like(like) {
 			eprintln('user ${user.id} failed to dislike post ${id}')
 			return ctx.server_error('failed to dislike post')
 		}
@@ -614,9 +586,7 @@ fn (mut app App) api_post_edit(mut ctx Context, id int, title string, body strin
 		return ctx.redirect('/')
 	}
 
-	sql app.db {
-		update Post set body = body, title = title where id == id
-	} or {
+	if !app.update_post(id, title, body) {
 		eprintln('failed to update post')
 		ctx.error('failed to update post')
 		return ctx.redirect('/')
@@ -633,9 +603,7 @@ fn (mut app App) api_post_pin(mut ctx Context, id int) veb.Result {
 	}
 
 	if user.admin {
-		sql app.db {
-			update Post set pinned = true where id == id
-		} or {
+		if !app.pin_post(id) {
 			eprintln('failed to pin post: ${id}')
 			ctx.error('failed to pin post')
 			return ctx.redirect('/post/${id}')
@@ -648,6 +616,23 @@ fn (mut app App) api_post_pin(mut ctx Context, id int) veb.Result {
 	}
 }
 
+@['/api/post/get/<id>'; get]
+fn (mut app App) api_post_get_post(mut ctx Context, id int) veb.Result {
+	post := app.get_post_by_id(id) or {
+		return ctx.text('no such post')
+	}
+	return ctx.json[Post](post)
+}
+
+@['/api/post/search'; get]
+fn (mut app App) api_post_search(mut ctx Context, query string, limit int, offset int) veb.Result {
+	if limit >= search_hard_limit {
+		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
+	}
+	posts := app.search_for_posts(query, limit, offset)
+	return ctx.json[[]PostSearchResult](posts)
+}
+
 ////// site //////
 
 @['/api/site/set_motd'; post]
@@ -658,9 +643,7 @@ fn (mut app App) api_site_set_motd(mut ctx Context, motd string) veb.Result {
 	}
 
 	if user.admin {
-		sql app.db {
-			update Site set motd = motd where id == 1
-		} or {
+		if !app.set_motd(motd) {
 			ctx.error('failed to set motd')
 			eprintln('failed to set motd: ${motd}')
 			return ctx.redirect('/')

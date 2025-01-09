@@ -18,3 +18,14 @@ pub fn (app &DatabaseAccess) get_or_create_site_config() Site {
 	}
 	return configs[0]
 }
+
+// set_motd sets the site's current message of the day, returns true if this
+// succeeds and false otherwise.
+pub fn (app &DatabaseAccess) set_motd(motd string) bool {
+	sql app.db {
+		update Site set motd = motd where id == 1
+	} or {
+		return false
+	}
+	return true
+}

@@ -1,7 +1,18 @@
 module database
 
 import time
-import entity { Post, Like, LikeCache }
+import entity { Post, User, Like, LikeCache }
+
+// add_post adds a new post to the database, returns true if this succeeded and
+// false otherwise.
+pub fn (app &DatabaseAccess) add_post(post &Post) bool {
+	sql app.db {
+		insert post into Post
+	} or {
+		return false
+	}
+	return true
+}
 
 // get_post_by_id gets a post by its id, returns none if it does not exist.
 pub fn (app &DatabaseAccess) get_post_by_id(id int) ?Post {
@@ -83,4 +94,89 @@ pub fn (app &DatabaseAccess) get_all_posts_from_user(user_id int) []Post {
 		select from Post where author_id == user_id order by posted_at desc
 	} or { [] }
 	return posts
+}
+
+// pin_post pins the given post, returns true if this succeeds and false
+// otherwise.
+pub fn (app &DatabaseAccess) pin_post(post_id int) bool {
+	sql app.db {
+		update Post set pinned = true where id == post_id
+	} or {
+		return false
+	}
+	return true
+}
+
+// update_post updates the given post's title and body with the given title and
+// body, returns true if this succeeds and false otherwise.
+pub fn (app &DatabaseAccess) update_post(post_id int, new_title string, new_body string) bool {
+	sql app.db {
+		update Post set body = new_body, title = new_title where id == post_id
+	} or {
+		return false
+	}
+	return true
+}
+
+// delete_post deletes the given post and all likes associated with it, returns
+// true if this succeeds and false otherwise.
+pub fn (app &DatabaseAccess) delete_post(id int) bool {
+	sql app.db {
+		delete from Post where id == id
+		delete from Like where post_id == id
+		delete from LikeCache where post_id == id
+	} or {
+		return false
+	}
+	return true
+}
+
+////// searching //////
+
+// PostSearchResult represents a search result for a post.
+pub struct PostSearchResult {
+pub mut:
+	post   Post
+	author User
+}
+
+@[inline]
+pub fn PostSearchResult.from_post(app &DatabaseAccess, post &Post) PostSearchResult {
+	return PostSearchResult{
+		post: post
+		author: app.get_user_by_id(post.author_id) or { app.get_unknown_user() }
+	}
+}
+
+@[inline]
+pub fn PostSearchResult.from_post_list(app &DatabaseAccess, posts []Post) []PostSearchResult {
+	mut results := []PostSearchResult{
+		cap: posts.len,
+		len: posts.len
+	}
+	for index, post in posts {
+		results[index] = PostSearchResult.from_post(app, post)
+	}
+	return results
+}
+
+// search_for_posts searches for posts matching the given query.
+// todo: query options/filters, such as user:beep, !excluded-text, etc
+pub fn (app &DatabaseAccess) search_for_posts(query string, limit int, offset int) []PostSearchResult {
+	sql_query := "\
+	SELECT *, CASE
+		WHEN title LIKE '%${query}%' THEN 1
+		WHEN body LIKE '%${query}%' THEN 2
+		END AS priority
+	FROM \"Post\"
+	WHERE title LIKE '%${query}%' OR body LIKE '%${query}%'
+	ORDER BY priority ASC LIMIT ${limit} OFFSET ${offset}"
+
+	queried_posts := app.db.q_strings(sql_query) or {
+		eprintln('search_for_posts error in app.db.q_strings: ${err}')
+		[]
+	}
+
+	posts := queried_posts.map(|it| Post.from_row(it))
+	return PostSearchResult.from_post_list(app, posts)
 }
