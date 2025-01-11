@@ -565,6 +565,36 @@ fn (mut app App) api_post_dislike(mut ctx Context, id int) veb.Result {
 	}
 }
 
+@['/api/post/save']
+fn (mut app App) api_post_save(mut ctx Context, id int) veb.Result {
+	user := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
+
+	if app.get_post_by_id(id) != none {
+		if app.toggle_save_post(user.id, id) {
+			return ctx.text('toggled save')
+		} else {
+			return ctx.server_error('failed to save post')
+		}
+	} else {
+		return ctx.server_error('post does not exist')
+	}
+}
+
+@['/api/post/save_for_later']
+fn (mut app App) api_post_save_for_later(mut ctx Context, id int) veb.Result {
+	user := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
+
+	if app.get_post_by_id(id) != none {
+		if app.toggle_save_for_later_post(user.id, id) {
+			return ctx.text('toggled save')
+		} else {
+			return ctx.server_error('failed to save post')
+		}
+	} else {
+		return ctx.server_error('post does not exist')
+	}
+}
+
 @['/api/post/get_title']
 fn (mut app App) api_post_get_title(mut ctx Context, id int) veb.Result {
 	post := app.get_post_by_id(id) or { return ctx.server_error('no such post') }

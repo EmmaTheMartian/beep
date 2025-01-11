@@ -21,10 +21,6 @@
 	<p><a href="/post/@{post.id}/reply">reply</a></p>
 	@end
 
-	@if ctx.is_logged_in() && post.author_id == user.id
-	<p><a href="/post/@{post.id}/edit">edit post</a></p>
-	@end
-
 	@if ctx.is_logged_in()
 	<br>
 	<div>
@@ -42,6 +38,20 @@
 			dislike
 			@end
 		</button>
+		<button onclick="save(@post.id)">
+			@if app.is_post_saved_by(user.id, post.id)
+			saved!
+			@else
+			save
+			@end
+		</button>
+		<button onclick="save_for_later(@post.id)">
+			@if app.is_post_saved_for_later_by(user.id, post.id)
+			saved for later!
+			@else
+			save for later
+			@end
+		</button>
 	</div>
 	@end
 
@@ -55,20 +65,9 @@
 	<h4>admin powers:</h4>
 	@end
 
-	<form action="/api/post/delete" method="post">
-		<input
-			type="number"
-			name="id"
-			id="id"
-			placeholder="post id"
-			value="@post.id"
-			required
-			readonly
-			hidden
-			aria-hidden
-		>
-		<input type="submit" value="delete">
-	</form>
+	@if post.author_id == user.id
+	<p><a href="/post/@{post.id}/edit">edit</a></p>
+	@end
 
 	@if user.admin
 	<form action="/api/post/pin" method="post">
@@ -78,10 +77,9 @@
 			id="id"
 			placeholder="post id"
 			value="@post.id"
-			required
-			readonly
-			hidden
-			aria-hidden
+			required aria-required
+			readonly aria-readonly
+			hidden aria-hidden
 		>
 		<input type="submit" value="pin">
 	</form>

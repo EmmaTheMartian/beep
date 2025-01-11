@@ -43,16 +43,28 @@ task:db.dangerous.nuke = {
 	run = 'docker rm beep-database && docker volume rm beep-data'
 }
 
+task:run.watch = {
+	description = 'Watch/run beep'
+	category = 'run'
+	run = '${v} -d veb_livereload watch run ${v_main} config.maple'
+}
+
+task:run.watch.real = {
+	description = 'Watch/run beep using config.real.maple'
+	category = 'run'
+	run = '${v} watch run ${v_main} config.real.maple'
+}
+
 task:run = {
 	description = 'Run beep'
 	category = 'run'
-	run = '${v} -d veb_livereload watch run ${v_main} config.maple'
+	run = '${v} run ${v_main} config.maple'
 }
 
 task:run.real = {
 	description = 'Run beep using config.real.maple'
 	category = 'run'
-	run = '${v} -d veb_livereload watch run ${v_main} config.real.maple'
+	run = '${v} -d veb_livereload run ${v_main} config.real.maple'
 }
 
 task:cloc = {

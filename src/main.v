@@ -50,6 +50,7 @@ fn main() {
 		create table entity.Like
 		create table entity.LikeCache
 		create table entity.Notification
+		create table entity.SavedPost
 	}!
 	println('<- done')
 

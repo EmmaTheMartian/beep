@@ -1,10 +1,12 @@
 @include 'partial/header.html'
 
 @if ctx.is_logged_in()
+<script src="/static/js/text_area_counter.js"></script>
+
 <h1>user settings:</h1>
 
 <form action="/api/user/set_bio" method="post">
-	<label for="bio">bio:</label>
+	<label for="bio">bio: (<span id="bio_chars">0/@{app.config.user.bio_max_len}</span>)</label>
 	<br>
 	<textarea
 		name="bio"
@@ -22,7 +24,7 @@
 <hr>
 
 <form action="/api/user/set_pronouns" method="post">
-	<label for="pronouns">pronouns:</label>
+	<label for="pronouns">pronouns: (<span id="pronouns_chars">0/@{app.config.user.pronouns_max_len}</span>)</label>
 	<input
 		type="text"
 		name="pronouns"
@@ -39,7 +41,7 @@
 <hr>
 
 <form action="/api/user/set_nickname" method="post">
-	<label for="nickname">nickname:</label>
+	<label for="nickname">nickname: (<span id="nickname_chars">0/@{app.config.user.nickname_max_len}</span>)</label>
 	<input
 		type="text"
 		name="nickname"
@@ -56,6 +58,12 @@
 <form action="/api/user/set_nickname" method="post">
 	<input type="submit" value="reset nickname">
 </form>
+
+<script>
+	add_character_counter('bio', 'bio_chars', @{app.config.user.bio_max_len})
+	add_character_counter('pronouns', 'pronouns_chars', @{app.config.user.pronouns_max_len})
+	add_character_counter('nickname', 'nickname_chars', @{app.config.user.nickname_max_len})
+</script>
 
 @if app.config.instance.allow_changing_theme
 <hr>

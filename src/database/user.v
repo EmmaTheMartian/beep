@@ -210,6 +210,7 @@ pub fn (app &DatabaseAccess) delete_user(user_id int) bool {
 // search_for_users searches for posts matching the given query.
 // todo: query options/filters, such as created-after:<date>, created-before:<date>, etc
 pub fn (app &DatabaseAccess) search_for_users(query string, limit int, offset int) []User {
+	//TODO: SANATIZE
 	sql_query := "\
 	SELECT *, CASE
 		WHEN username LIKE '%${query}%' THEN 1

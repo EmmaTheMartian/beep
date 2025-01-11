@@ -1,7 +1,8 @@
 @include 'partial/header.html'
 
-<script src="/static/js/post.js"></script>
-<script src="/static/js/render_body.js"></script>
+<script src="/static/js/post.js" defer></script>
+<script src="/static/js/render_body.js" defer></script>
+<script src="/static/js/text_area_counter.js"></script>
 
 <h1>edit post</h1>
 
@@ -18,6 +19,8 @@
 			hidden
 			aria-hidden
 		>
+
+		<p id="title_chars">0/@{app.config.post.title_max_len}</p>
 		<input
 			type="text"
 			name="title"
@@ -30,6 +33,8 @@
 			required
 		>
 		<br>
+
+		<p id="body_chars">0/@{app.config.post.body_max_len}</p>
 		<textarea
 			name="body"
 			id="body"
@@ -41,7 +46,32 @@
 			required
 		>@post.body</textarea>
 		<br>
+
 		<input type="submit" value="save">
+	</form>
+
+	<script>
+		add_character_counter('title', 'title_chars', @{app.config.post.title_max_len})
+		add_character_counter('body', 'body_chars', @{app.config.post.body_max_len})
+	</script>
+</div>
+
+<hr>
+
+<div>
+	<h2>danger zone:</h2>
+	<form action="/api/post/delete" method="post">
+		<input
+			type="number"
+			name="id"
+			id="id"
+			placeholder="post id"
+			value="@post.id"
+			required aria-required
+			readonly aria-readonly
+			hidden aria-hidden
+		>
+		<input type="submit" value="delete">
 	</form>
 </div>
 

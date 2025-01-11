@@ -33,6 +33,28 @@ fn (mut app App) me(mut ctx Context) veb.Result {
 	return ctx.redirect('/user/${user.username}')
 }
 
+@['/me/saved']
+fn (mut app App) me_saved(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} - saved posts'
+	posts := app.get_saved_posts_as_post_for(user.id)
+	return $veb.html('../templates/saved_posts.html')
+}
+
+@['/me/saved_for_later']
+fn (mut app App) me_saved_for_later(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('not logged in')
+		return ctx.redirect('/login')
+	}
+	ctx.title = '${app.config.instance.name} - posts saved for later'
+	posts := app.get_saved_for_later_posts_as_post_for(user.id)
+	return $veb.html('../templates/saved_posts_for_later.html')
+}
+
 fn (mut app App) settings(mut ctx Context) veb.Result {
 	user := app.whoami(mut ctx) or {
 		ctx.error('not logged in')
@@ -75,6 +97,7 @@ fn (mut app App) user(mut ctx Context, username string) veb.Result {
 		return ctx.redirect('/')
 	}
 	ctx.title = '${app.config.instance.name} - ${user.get_name()}'
+	posts := app.get_posts_from_user(viewing.id, 10)
 	return $veb.html('../templates/user.html')
 }
 

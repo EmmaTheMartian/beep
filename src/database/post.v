@@ -163,6 +163,7 @@ pub fn PostSearchResult.from_post_list(app &DatabaseAccess, posts []Post) []Post
 // search_for_posts searches for posts matching the given query.
 // todo: query options/filters, such as user:beep, !excluded-text, etc
 pub fn (app &DatabaseAccess) search_for_posts(query string, limit int, offset int) []PostSearchResult {
+	//TODO: SANATIZE
 	sql_query := "\
 	SELECT *, CASE
 		WHEN title LIKE '%${query}%' THEN 1

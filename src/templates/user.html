@@ -18,12 +18,15 @@
 </h1>
 
 @if app.logged_in_as(mut ctx, viewing.id)
+<script src="/static/js/text_area_counter.js"></script>
+
 <p>this is you!</p>
 
 <div>
 	<form action="/api/post/new_post" method="post">
 		<h2>new post:</h2>
 
+		<p id="title_chars">0/@{app.config.post.title_max_len}</p>
 		<input
 			type="text"
 			name="title"
@@ -33,9 +36,11 @@
 			pattern="@app.config.post.title_pattern"
 			placeholder="title"
 			required aria-required
+			autocomplete="off" aria-autocomplete="off"
 		>
 		<br>
 
+		<p id="body_chars">0/@{app.config.post.body_max_len}</p>
 		<textarea
 			name="body"
 			id="body"
@@ -45,12 +50,19 @@
 			cols="30"
 			placeholder="body"
 			required aria-required
+			autocomplete="off" aria-autocomplete="off"
 		></textarea>
 		<br>
 
 		<input type="submit" value="post!">
 	</form>
+
+	<script>
+		add_character_counter('title', 'title_chars', @{app.config.post.title_max_len})
+		add_character_counter('body', 'body_chars', @{app.config.post.body_max_len})
+	</script>
 </div>
+<hr>
 @end
 
 @if viewing.bio != ''
@@ -58,16 +70,31 @@
 	<h2>bio:</h2>
 	<pre id="bio">@viewing.bio</pre>
 </div>
+<hr>
+@end
+
+@if app.logged_in_as(mut ctx, viewing.id)
+<div>
+	<p><a href="/me/saved">saved posts</a></p>
+	<p><a href="/me/saved_for_later">saved for later</a></p>
+</div>
+<hr>
 @end
 
 <div>
 	<h2>recent posts:</h2>
-	@for post in app.get_posts_from_user(viewing.id, 10)
+	@if posts.len > 0
+	@for post in posts
 	@include 'components/post_small.html'
+	@end
+	@else
+	<p>no posts!</p>
 	@end
 </div>
 
 @if ctx.is_logged_in() && user.admin
+<hr>
+
 <div>
 	<h2>admin powers:</h2>
 	<form action="/api/user/set_muted" method="post">

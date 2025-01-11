@@ -81,3 +81,15 @@ spec for beep:
 | `user_id` | int    | the user that receives this notification |
 | `summary` | string | the summary for this notification        |
 | `body`    | string | the full text for this notification      |
+
+## `SavedPost`
+
+> a list of saved posts for a user
+
+| name      | type | desc                                             |
+|-----------|------|--------------------------------------------------|
+| `id`      | int  | identifier for this entry, this is mostly unused |
+| `post_id` | int  | the id of the post this entry relates to         |
+| `user_id` | int  | the id of the user that saved this post          |
+| `saved`   | bool | if this post is saved                            |
+| `later`   | bool | if this post is saved in "read later"            |
