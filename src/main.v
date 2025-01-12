@@ -6,6 +6,7 @@ import auth
 import entity
 import os
 import webapp { App, Context, StringValidator }
+import beep_sql
 
 fn main() {
 	config := webapp.load_config_from(os.args[1])
@@ -23,6 +24,8 @@ fn main() {
 	defer {
 		db.close()
 	}
+
+	beep_sql.load(mut db)
 
 	mut app := &App{
 		config: config
