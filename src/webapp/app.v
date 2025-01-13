@@ -11,7 +11,10 @@ pub struct App {
 	veb.StaticHandler
 	DatabaseAccess
 pub:
-	config Config
+	config   Config
+	commit   string = @VMODHASH
+	built_at string = @BUILD_TIMESTAMP
+	v_hash   string = @VHASH
 pub mut:
 	auth       auth.Auth[pg.DB]
 	validators struct {

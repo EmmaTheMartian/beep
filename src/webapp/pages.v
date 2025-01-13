@@ -206,3 +206,10 @@ fn (mut app App) search(mut ctx Context, q string, offset int) veb.Result {
 	ctx.title = '${app.config.instance.name} - search'
 	return $veb.html('../templates/search.html')
 }
+
+@['/about']
+fn (mut app App) about(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or { User{} }
+	ctx.title = '${app.config.instance.name} - about'
+	return $veb.html('../templates/about.html')
+}

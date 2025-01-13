@@ -13,6 +13,8 @@ pub mut:
 		welcome              string
 		default_theme        string
 		allow_changing_theme bool
+		version              string
+		source               string
 	}
 	http        struct {
 	pub mut:
@@ -72,6 +74,8 @@ pub fn load_config_from(file_path string) Config {
 	config.instance.welcome = loaded_instance.get('welcome').to_str()
 	config.instance.default_theme = loaded_instance.get('default_theme').to_str()
 	config.instance.allow_changing_theme = loaded_instance.get('allow_changing_theme').to_bool()
+	config.instance.version = loaded_instance.get('version').to_str()
+	config.instance.source = loaded_instance.get('source').to_str()
 
 	loaded_http := loaded.get('http')
 	config.http.port = loaded_http.get('port').to_int()

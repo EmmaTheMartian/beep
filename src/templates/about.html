@@ -1,0 +1,20 @@
+@include 'partial/header.html'
+
+<h1>about this instance</h1>
+
+<div>
+	<p>name: @{app.config.instance.name}</p>
+	<p>version: @{app.config.instance.version} (commit: @{app.commit})</p>
+	<p>built at @{app.built_at} (<span id="built_at">date n/a</span>)</p>
+	<p>built using @{app.v_hash}</p>
+
+	@if app.config.instance.source != ''
+	<p>source: <a href="@{app.config.instance.source}">@{app.config.instance.source}</a></p>
+	@end
+</div>
+
+<script>
+	document.getElementById('built_at').innerText = new Date(@{app.built_at} * 1000).toLocaleString()
+</script>
+
+@include 'partial/footer.html'

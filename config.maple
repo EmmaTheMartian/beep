@@ -7,6 +7,12 @@ instance = {
 
 	default_theme = 'https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css'
 	allow_changing_theme = true
+
+	// instance version
+	version = '2025.01'
+
+	// set this to '' if your instance is closed source (twt)
+	source = 'https://github.com/emmathemartian/beep'
 }
 
 http = {
