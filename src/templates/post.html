@@ -17,11 +17,8 @@
 	<p><em>likes: @{app.get_net_likes_for_post(post.id)}</em></p>
 	<p><em>posted at: @post.posted_at</em></p>
 
-	@if ctx.is_logged_in()
+	@if ctx.is_logged_in() && !user.automated
 	<p><a href="/post/@{post.id}/reply">reply</a></p>
-	@end
-
-	@if ctx.is_logged_in()
 	<br>
 	<div>
 		<button onclick="like(@post.id)">
