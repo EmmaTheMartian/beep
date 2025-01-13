@@ -13,8 +13,9 @@ pub mut:
 	password      string
 	password_salt string
 
-	muted bool
-	admin bool
+	muted     bool
+	admin     bool
+	automated bool
 
 	theme string
 

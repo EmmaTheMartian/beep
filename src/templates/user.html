@@ -8,20 +8,24 @@
 	(@viewing.pronouns)
 	@end
 
-	@if viewing.muted && viewing.admin
-	[muted admin, somehow]
-	@else if viewing.muted
+	@if viewing.muted
 	[muted]
-	@else if viewing.admin
+	@end
+
+	@if viewing.automated
+	[automated]
+	@end
+
+	@if viewing.admin
 	[admin]
 	@end
 </h1>
 
 @if app.logged_in_as(mut ctx, viewing.id)
-<script src="/static/js/text_area_counter.js"></script>
-
 <p>this is you!</p>
 
+@if !user.automated
+<script src="/static/js/text_area_counter.js"></script>
 <div>
 	<form action="/api/post/new_post" method="post">
 		<h2>new post:</h2>
@@ -63,6 +67,7 @@
 	</script>
 </div>
 <hr>
+@end
 @end
 
 @if viewing.bio != ''

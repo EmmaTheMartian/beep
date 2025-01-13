@@ -94,8 +94,28 @@
 
 <hr>
 
+<form action="/api/user/set_automated" method="post">
+	<label for="is_automated">is automated:</label>
+	<input
+		type="checkbox"
+		name="is_automated"
+		id="is_automated"
+		value="true"
+		@if user.automated
+		checked aria-checked
+		@end
+	>
+	<input type="submit" value="save">
+	<p>automated accounts are primarily intended to tell users that this account makes posts automatically.</p>
+	<p>it will also hide most front-end interactions since the user of this account likely will not be using those very often.</p>
+</form>
+
+<hr>
+
 <details>
 	<summary>dangerous settings (click to reveal)</summary>
+
+	<br>
 
 	<details>
 		<summary>change password (click to reveal)</summary>
@@ -112,6 +132,7 @@
 				required aria-required
 				autocomplete="off" aria-autocomplete="off"
 			>
+			<br>
 			<label for="new_password">new password:</label>
 			<input
 				type="password"
@@ -126,6 +147,8 @@
 			<input type="submit" value="save">
 		</form>
 	</details>
+
+	<br>
 
 	<details>
 		<summary>account deletion (click to reveal)</summary>

@@ -18,6 +18,7 @@ spec for beep:
 | `password_salt` | string    | salt for this user's password                    |
 | `muted`         | bool      | controls whether or not this user can make posts |
 | `admin`         | bool      | controls whether or not this user is an admin    |
+| `automated`     | bool      | controls whether or not this user is automated   |
 | `theme`         | ?string   | controls per-user css themes                     |
 | `bio`           | string    | bio for this user                                |
 | `pronouns`      | string    | pronouns for this user                           |

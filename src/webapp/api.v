@@ -49,7 +49,7 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 		)
 		token := app.auth.add_token(x.id, ctx.ip()) or {
 			eprintln(err)
-			ctx.error('could not create token for user with id ${x.id}')
+			ctx.error('api_user_register: could not create token for user with id ${x.id}')
 			return ctx.redirect('/')
 		}
 		ctx.set_cookie(
@@ -60,7 +60,7 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 			path:      '/'
 		)
 	} else {
-		eprintln('could not log into newly-created user: ${user}')
+		eprintln('api_user_register: could not log into newly-created user: ${user}')
 		ctx.error('could not log into newly-created user.')
 	}
 
@@ -110,17 +110,24 @@ fn (mut app App) api_user_set_password(mut ctx Context, current_password string,
 		return ctx.redirect('/settings')
 	}
 
-	// invalidate tokens
+	hashed_new_password := auth.hash_password_with_salt(new_password, user.password_salt)
+	if !app.set_password(user.id, hashed_new_password) {
+		ctx.error('failed to update password')
+		return ctx.redirect('/settings')
+	}
+
+	// invalidate tokens and log out
 	app.auth.delete_tokens_for_user(user.id) or {
 		eprintln('failed to yeet tokens during password deletion for ${user.id} (${err})')
 		return ctx.redirect('/settings')
 	}
-
-	hashed_new_password := auth.hash_password_with_salt(new_password, user.password_salt)
-
-	if !app.set_password(user.id, hashed_new_password) {
-		ctx.error('failed to update password')
-	}
+	ctx.set_cookie(
+		name:      'token'
+		value:     ''
+		same_site: .same_site_none_mode
+		secure:    true
+		path:      '/'
+	)
 
 	return ctx.redirect('/login')
 }
@@ -257,6 +264,20 @@ fn (mut app App) api_user_set_muted(mut ctx Context, id int, muted bool) veb.Res
 	}
 }
 
+@['/api/user/set_automated'; post]
+fn (mut app App) api_user_set_automated(mut ctx Context, is_automated bool) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	if !app.set_automated(user.id, is_automated) {
+		ctx.error('failed to set automated status.')
+	}
+
+	return ctx.redirect('/me')
+}
+
 @['/api/user/set_theme'; post]
 fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
 	if !app.config.instance.allow_changing_theme {
@@ -330,45 +351,6 @@ fn (mut app App) api_user_get_name(mut ctx Context, username string) veb.Result 
 	return ctx.text(user.get_name())
 }
 
-/// user/notification ///
-
-@['/api/user/notification/clear']
-fn (mut app App) api_user_notification_clear(mut ctx Context, id int) veb.Result {
-	user := app.whoami(mut ctx) or {
-		ctx.error('you are not logged in!')
-		return ctx.redirect('/login')
-	}
-
-	if notification := app.get_notification_by_id(id) {
-		if notification.user_id != user.id {
-			ctx.error('no such notification for user')
-			return ctx.redirect('/inbox')
-		} else {
-			if !app.delete_notification(id) {
-				ctx.error('failed to delete notification')
-				return ctx.redirect('/inbox')
-			}
-		}
-	} else {
-		ctx.error('no such notification for user')
-	}
-
-	return ctx.redirect('/inbox')
-}
-
-@['/api/user/notification/clear_all']
-fn (mut app App) api_user_notification_clear_all(mut ctx Context) veb.Result {
-	user := app.whoami(mut ctx) or {
-		ctx.error('you are not logged in!')
-		return ctx.redirect('/login')
-	}
-	if !app.delete_notifications_for_user(user.id) {
-		ctx.error('failed to delete notifications')
-		return ctx.redirect('/inbox')
-	}
-	return ctx.redirect('/inbox')
-}
-
 @['/api/user/delete']
 fn (mut app App) api_user_delete(mut ctx Context, id int) veb.Result {
 	user := app.whoami(mut ctx) or {
@@ -413,6 +395,45 @@ fn (mut app App) api_user_search(mut ctx Context, query string, limit int, offse
 	}
 	users := app.search_for_users(query, limit, offset)
 	return ctx.json[[]User](users)
+}
+
+/// user/notification ///
+
+@['/api/user/notification/clear']
+fn (mut app App) api_user_notification_clear(mut ctx Context, id int) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+
+	if notification := app.get_notification_by_id(id) {
+		if notification.user_id != user.id {
+			ctx.error('no such notification for user')
+			return ctx.redirect('/inbox')
+		} else {
+			if !app.delete_notification(id) {
+				ctx.error('failed to delete notification')
+				return ctx.redirect('/inbox')
+			}
+		}
+	} else {
+		ctx.error('no such notification for user')
+	}
+
+	return ctx.redirect('/inbox')
+}
+
+@['/api/user/notification/clear_all']
+fn (mut app App) api_user_notification_clear_all(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		ctx.error('you are not logged in!')
+		return ctx.redirect('/login')
+	}
+	if !app.delete_notifications_for_user(user.id) {
+		ctx.error('failed to delete notifications')
+		return ctx.redirect('/inbox')
+	}
+	return ctx.redirect('/inbox')
 }
 
 ////// post //////

@@ -48,7 +48,7 @@ user = {
 
 	password_min_len = 12
 	password_max_len = 72
-	password_pattern = '(.|\s)+'
+	password_pattern = '.+'
 
 	pronouns_min_len = 0
 	pronouns_max_len = 30

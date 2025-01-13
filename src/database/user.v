@@ -65,6 +65,18 @@ pub fn (app &DatabaseAccess) set_muted(user_id int, muted bool) bool {
 	return true
 }
 
+// set_automated sets the given user's automated status, returns true if this
+// succeeded and false otherwise.
+pub fn (app &DatabaseAccess) set_automated(user_id int, automated bool) bool {
+	sql app.db {
+		update User set automated = automated where id == user_id
+	} or {
+		eprintln('failed to update automated status for ${user_id}')
+		return false
+	}
+	return true
+}
+
 // set_theme sets the given user's theme url, returns true if this succeeded and
 // false otherwise.
 pub fn (app &DatabaseAccess) set_theme(user_id int, theme ?string) bool {
