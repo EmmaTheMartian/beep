@@ -36,6 +36,14 @@
 - [ ] site:log new accounts, account deletions, etc etc in an admin-accessible site log
 	- this should be set up to only log things when an admin enables it in the site config, so as to only log when necessary
 - [ ] site:implement a database keep-alive system
+	- i may also just need to change a setting in the database server to keep it alive, i am not sure yet.
+- [ ] site:overhaul security
+	- i am not a database security specialist, and some of the methods below may be bad.
+	before approaching which security features i want implemented, i will be consulting some other people to be sure of which ones need to be and do not need to be implemented.
+	- [ ] row level security?
+	- [ ] roles/user groups?
+	- [ ] whitelist maps where possible?
+	- [ ] database firewall?
 
 ## ideas
 
