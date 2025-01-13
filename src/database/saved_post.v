@@ -1,6 +1,8 @@
 module database
 
+import db.pg
 import entity { SavedPost, Post }
+import util
 
 // get_saved_posts_for gets all SavedPost objects for a given user.
 pub fn (app &DatabaseAccess) get_saved_posts_for(user_id int) []SavedPost {
@@ -13,14 +15,13 @@ pub fn (app &DatabaseAccess) get_saved_posts_for(user_id int) []SavedPost {
 // get_saved_posts_as_post_for gets all saved posts for a given user converted
 // to Post objects.
 pub fn (app &DatabaseAccess) get_saved_posts_as_post_for(user_id int) []Post {
-	saved_posts := sql app.db {
-		select from SavedPost where user_id == user_id && saved == true
-	} or { [] }
-	posts := saved_posts.map(fn [app] (it SavedPost) Post {
-		return app.get_post_by_id(it.post_id) or {
+	saved_posts := app.db.exec_param('SELECT id, post_id FROM "SavedPost" WHERE user_id = $1 AND saved = TRUE', user_id.str()) or { [] }
+	posts := saved_posts.map(fn [app] (it pg.Row) Post {
+		return app.get_post_by_id(util.or_throw(it.vals[1]).int()) or {
 			// if the post does not exist, we will remove it now
+			id := util.or_throw(it.vals[0]).int()
 			sql app.db {
-				delete from SavedPost where id == it.id
+				delete from SavedPost where id == id
 			} or {
 				eprintln('get_saved_posts_as_post_for: failed to remove non-existent post from saved post: ${it}')
 			}

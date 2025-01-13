@@ -47,9 +47,7 @@ pub fn (app &DatabaseAccess) get_notifications_for(user_id int) []Notification {
 // get_notification_count gets the amount of notifications a user has, with a
 // given limit.
 pub fn (app &DatabaseAccess) get_notification_count(user_id int, limit int) int {
-	notifications := sql app.db {
-		select from Notification where user_id == user_id limit limit
-	} or { [] }
+	notifications := app.db.exec_param2('SELECT id FROM "Notification" WHERE user_id = $1 LIMIT $2', user_id.str(), limit.str()) or { [] }
 	return notifications.len
 }
 

@@ -64,7 +64,7 @@ task:run = {
 task:run.real = {
 	description = 'Run beep using config.real.maple'
 	category = 'run'
-	run = '${v} -d veb_livereload run ${v_main} config.real.maple'
+	run = '${v} run ${v_main} config.real.maple'
 }
 
 task:cloc = {

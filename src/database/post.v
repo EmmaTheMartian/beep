@@ -1,7 +1,9 @@
 module database
 
 import time
+import db.pg
 import entity { Post, User, Like, LikeCache }
+import util
 
 // add_post adds a new post to the database, returns true if this succeeded and
 // false otherwise.
@@ -66,11 +68,9 @@ pub fn (app &DatabaseAccess) get_recent_posts() []Post {
 // get_popular_posts returns a list of the ten most liked posts.
 // TODO: make this time-gated (i.e, top ten liked posts of the day)
 pub fn (app &DatabaseAccess) get_popular_posts() []Post {
-	cached_likes := sql app.db {
-		select from LikeCache order by likes desc limit 10
-	} or { [] }
-	posts := cached_likes.map(fn [app] (it LikeCache) Post {
-		return app.get_post_by_id(it.post_id) or {
+	cached_likes := app.db.exec('SELECT post_id FROM "LikeCache" ORDER BY likes DESC LIMIT 10') or { [] }
+	posts := cached_likes.map(fn [app] (it pg.Row) Post {
+		return app.get_post_by_id(util.or_throw(it.vals[0]).int()) or {
 			eprintln('cached like ${it} does not have a post related to it (from get_popular_posts)')
 			return Post{}
 		}

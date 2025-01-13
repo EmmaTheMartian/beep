@@ -13,6 +13,6 @@ pub mut:
 pub struct LikeCache {
 pub mut:
 	id      int @[primary; sql: serial]
-	post_id int
+	post_id int @[unique]
 	likes   int
 }

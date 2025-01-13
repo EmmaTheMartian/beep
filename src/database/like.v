@@ -1,6 +1,7 @@
 module database
 
 import entity { Like, LikeCache }
+import util
 
 // add_like adds a like to the database, returns true if this succeeds and false
 // otherwise.
@@ -18,21 +19,16 @@ pub fn (app &DatabaseAccess) add_like(like &Like) bool {
 // get_net_likes_for_post returns the net likes of the given post.
 pub fn (app &DatabaseAccess) get_net_likes_for_post(post_id int) int {
 	// check cache
-	cache := sql app.db {
-		select from LikeCache where post_id == post_id limit 1
-	} or { [] }
+	cache := app.db.exec_param('SELECT likes FROM "LikeCache" WHERE post_id = $1 LIMIT 1', post_id.str()) or { [] }
 
 	mut likes := 0
 
 	if cache.len != 1 {
 		println('calculating net likes for post: ${post_id}')
 		// calculate
-		db_likes := sql app.db {
-			select from Like where post_id == post_id
-		} or { [] }
-
+		db_likes := app.db.exec_param('SELECT is_like FROM "Like" WHERE post_id = $1', post_id.str()) or { [] }
 		for like in db_likes {
-			if like.is_like {
+			if util.or_throw(like.vals[0]).bool() {
 				likes++
 			} else {
 				likes--
@@ -51,7 +47,7 @@ pub fn (app &DatabaseAccess) get_net_likes_for_post(post_id int) int {
 			return likes
 		}
 	} else {
-		likes = cache.first().likes
+		likes = util.or_throw(cache.first().vals[0]).int()
 	}
 
 	return likes

@@ -23,7 +23,6 @@
 		created-before:<date>
 		is:admin
 		```
-- [ ] misc:replace `SEARCH *` with `SEARCH <column>`
 
 ## planing
 
@@ -65,6 +64,7 @@ as images, music links, etc)
 	discord, and other common links. we want those ones to look fancy!
 - [x] post:saving (add the post to a list of saved posts that a user can view later)
 - [x] site:message of the day (admins can add a welcome message displayed on index.html)
+- [x] misc:replace `SELECT *` with `SELECT <column>`
 
 ## graveyard
 

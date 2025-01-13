@@ -1,6 +1,7 @@
 module database
 
 import entity { User, Notification, Like, LikeCache, Post }
+import util
 
 // new_user creates a new user and returns their struct after creation.
 pub fn (app &DatabaseAccess) new_user(user User) ?User {
@@ -134,41 +135,35 @@ pub fn (app &DatabaseAccess) get_users() []User {
 
 // does_user_like_post returns true if a user likes the given post.
 pub fn (app &DatabaseAccess) does_user_like_post(user_id int, post_id int) bool {
-	likes := sql app.db {
-		select from Like where user_id == user_id && post_id == post_id
-	} or { [] }
+	likes := app.db.exec_param2('SELECT id, is_like FROM "Like" WHERE user_id = $1 AND post_id = $2', user_id.str(), post_id.str()) or { [] }
 	if likes.len > 1 {
 		// something is very wrong lol
-		eprintln('a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
+		eprintln('does_user_like_post: a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
 	} else if likes.len == 0 {
 		return false
 	}
-	return likes.first().is_like
+	return util.or_throw(likes.first().vals[1]).bool()
 }
 
 // does_user_dislike_post returns true if a user dislikes the given post.
 pub fn (app &DatabaseAccess) does_user_dislike_post(user_id int, post_id int) bool {
-	likes := sql app.db {
-		select from Like where user_id == user_id && post_id == post_id
-	} or { [] }
+	likes := app.db.exec_param2('SELECT id, is_like FROM "Like" WHERE user_id = $1 AND post_id = $2', user_id.str(), post_id.str()) or { [] }
 	if likes.len > 1 {
 		// something is very wrong lol
-		eprintln('a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
+		eprintln('does_user_dislike_post: a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
 	} else if likes.len == 0 {
 		return false
 	}
-	return !likes.first().is_like
+	return !util.or_throw(likes.first().vals[1]).bool()
 }
 
 // does_user_like_or_dislike_post returns true if a user likes *or* dislikes the
 // given post.
 pub fn (app &DatabaseAccess) does_user_like_or_dislike_post(user_id int, post_id int) bool {
-	likes := sql app.db {
-		select from Like where user_id == user_id && post_id == post_id
-	} or { [] }
+	likes := app.db.exec_param2('SELECT id FROM "Like" WHERE user_id = $1 AND post_id = $2', user_id.str(), post_id.str()) or { [] }
 	if likes.len > 1 {
 		// something is very wrong lol
-		eprintln('a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
+		eprintln('does_user_like_or_dislike_post: a user somehow got two or more likes on the same post (user: ${user_id}, post: ${post_id})')
 	}
 	return likes.len == 1
 }
@@ -185,16 +180,15 @@ pub fn (app &DatabaseAccess) delete_user(user_id int) bool {
 	}
 
 	// delete posts and their likes
-	posts_from_this_user := sql app.db {
-		select from Post where author_id == user_id
-	} or { [] }
+	posts_from_this_user := app.db.exec_param('SELECT id FROM "Post" WHERE author_id = $1', user_id.str()) or { [] }
 
 	for post in posts_from_this_user {
+		id := util.or_throw(post.vals[0]).int()
 		sql app.db {
-			delete from Like where post_id == post.id
-			delete from LikeCache where post_id == post.id
+			delete from Like where post_id == id
+			delete from LikeCache where post_id == id
 		} or {
-			eprintln('failed to delete like cache for post during user deletion: ${post.id}')
+			eprintln('failed to delete like cache for post during user deletion: ${id}')
 		}
 	}
 
