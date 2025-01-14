@@ -397,6 +397,14 @@ fn (mut app App) api_user_search(mut ctx Context, query string, limit int, offse
 	return ctx.json[[]User](users)
 }
 
+@['/api/user/whoami'; get]
+fn (mut app App) api_user_whoami(mut ctx Context) veb.Result {
+	user := app.whoami(mut ctx) or {
+		return ctx.text('not logged in')
+	}
+	return ctx.text(user.username)
+}
+
 /// user/notification ///
 
 @['/api/user/notification/clear']
