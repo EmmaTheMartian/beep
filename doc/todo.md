@@ -31,8 +31,6 @@
 
 - [ ] post:add more embedded link handling! (discord, github, gitlab, codeberg, etc)
 - [ ] user:follow other users (send notifications on new posts)
-- [ ] site:webhooks
-	- could be used so that a github webhook can send a message when a new commit is pushed to beep!
 - [ ] site:log new accounts, account deletions, etc etc in an admin-accessible site log
 	- this should be set up to only log things when an admin enables it in the site config, so as to only log when necessary
 - [ ] site:implement a database keep-alive system
