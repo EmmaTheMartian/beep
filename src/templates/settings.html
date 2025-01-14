@@ -15,7 +15,6 @@
 		rows="10"
 		minlength="@app.config.user.bio_min_len"
 		maxlength="@app.config.user.bio_max_len"
-		required aria-required
 	>@user.bio</textarea>
 	<br>
 	<input type="submit" value="save">
@@ -33,7 +32,6 @@
 		maxlength="@app.config.user.pronouns_max_len"
 		pattern="@app.config.user.pronouns_pattern"
 		value="@user.pronouns"
-		required aria-required
 	>
 	<input type="submit" value="save">
 </form>
@@ -50,7 +48,6 @@
 		minlength="@app.config.user.nickname_min_len"
 		maxlength="@app.config.user.nickname_max_len"
 		value="@{user.nickname or { '' }}"
-		required aria-required
 	>
 	<input type="submit" value="save">
 </form>

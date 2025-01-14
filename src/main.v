@@ -43,13 +43,17 @@ fn init_db(mut app App) {
 
 @[inline]
 fn load_validators(mut app App) {
-	app.validators.username = StringValidator.new(app.config.user.username_min_len,app.config.user.username_max_len,app.config.user.username_pattern)
-	app.validators.password = StringValidator.new(app.config.user.password_min_len,app.config.user.password_max_len,app.config.user.password_pattern)
-	app.validators.nickname = StringValidator.new(app.config.user.nickname_min_len,app.config.user.nickname_max_len,app.config.user.nickname_pattern)
-	app.validators.user_bio = StringValidator.new(app.config.user.bio_min_len,app.config.user.bio_max_len,app.config.user.bio_pattern)
-	app.validators.pronouns = StringValidator.new(app.config.user.pronouns_min_len,app.config.user.pronouns_max_len,app.config.user.pronouns_pattern)
-	app.validators.post_title = StringValidator.new(app.config.post.title_min_len,app.config.post.title_max_len,app.config.post.title_pattern)
-	app.validators.post_body = StringValidator.new(app.config.post.body_min_len,app.config.post.body_max_len,app.config.post.body_pattern)
+	// vfmt off
+	user := app.config.user
+	app.validators.username   = StringValidator.new(user.username_min_len, user.username_max_len, user.username_pattern)
+	app.validators.password   = StringValidator.new(user.password_min_len, user.password_max_len, user.password_pattern)
+	app.validators.nickname   = StringValidator.new(user.nickname_min_len, user.nickname_max_len, user.nickname_pattern)
+	app.validators.user_bio   = StringValidator.new(user.bio_min_len,      user.bio_max_len,      user.bio_pattern)
+	app.validators.pronouns   = StringValidator.new(user.pronouns_min_len, user.pronouns_max_len, user.pronouns_pattern)
+	post := app.config.post
+	app.validators.post_title = StringValidator.new(post.title_min_len,    post.title_max_len,    post.title_pattern)
+	app.validators.post_body  = StringValidator.new(post.body_min_len,     post.body_max_len,     post.body_pattern)
+	// vfmt on
 }
 
 fn main() {

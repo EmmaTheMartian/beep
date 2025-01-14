@@ -43,6 +43,18 @@ task:db.dangerous.nuke = {
 	run = 'docker rm beep-database && docker volume rm beep-data'
 }
 
+task:ngrok = {
+	description = 'Open an ngrok tunnel for testing.'
+	category = 'misc'
+	run = 'ngrok http http://localhost:8008'
+}
+
+task:ngrok.url = {
+	description = 'Open an ngrok tunnel for testing. Requires you to pass the ngrok URL as an argument.'
+	category = 'misc'
+	run = 'ngrok http --url=${args} http://localhost:8008'
+}
+
 task:run.watch = {
 	description = 'Watch/run beep'
 	category = 'run'
