@@ -70,11 +70,12 @@ fn main() {
 		name: 'connect to db'
 		log: true
 	)
-
 	defer { app.db.close() or { panic(err) } }
 
-	// add authenticator
-	app.auth = auth.new(app.db)
+	// initialize database
+	util.time_it(it: fn [mut app] () {
+		init_db(mut app)
+	}, name: 'init db', log: true)
 
 	// load sql files kept in beep_sql/
 	util.time_it(
@@ -85,16 +86,14 @@ fn main() {
 		log: true
 	)
 
+	// add authenticator
+	app.auth = auth.new(app.db)
+
 	// load validators
 	load_validators(mut app)
 
 	// mount static things
 	app.mount_static_folder_at(app.config.static_path, '/static')!
-
-	// initialize database
-	util.time_it(it: fn [mut app] () {
-		init_db(mut app)
-	}, name: 'init db', log: true)
 
 	// make the website config, if it does not exist
 	app.get_or_create_site_config()
