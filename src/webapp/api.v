@@ -24,7 +24,7 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 	// before doing *anything*, check the captchas
 	if app.config.hcaptcha.enabled {
 		token := ctx.form['h-captcha-response']
-		response := http.post('https://api.hcaptcha.com/siteverify', '{
+		response := http.post_json('https://api.hcaptcha.com/siteverify', '{
 			"secret": "${app.config.hcaptcha.secret}",
 			// "remoteip": "${ctx.ip()}",
 			"response": "${token}"
