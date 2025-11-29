@@ -11,26 +11,6 @@ import json
 // people from requesting searches with huge limits and straining the SQL server
 pub const search_hard_limit = 50
 
-////// util ///////
-
-const always_public_routes = [
-	'/api/user/register/',
-]
-
-fn (mut app App) public_data_check(mut ctx Context) ?veb.Result {
-	if !app.config.instance.public_data {
-		println(ctx.req.url)
-		if ctx.req.url in always_public_routes {
-			return none
-		}
-		_ := app.whoami(mut ctx) or {
-			ctx.error('not logged in')
-			return ctx.redirect('/login')
-		}
-	}
-	return none
-}
-
 ////// user //////
 
 struct HcaptchaResponse {
@@ -81,6 +61,11 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 	// validate password
 	if !app.validators.password.validate(password) {
 		ctx.error('invalid password')
+		return ctx.redirect('/register')
+	}
+
+	if password != ctx.form['confirm-password'] {
+		ctx.error('passwords do not match')
 		return ctx.redirect('/register')
 	}
 

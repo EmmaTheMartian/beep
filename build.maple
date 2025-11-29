@@ -10,7 +10,7 @@ task:db.init = {
 		-e POSTGRES_PASSWORD=beep \
 		--mount source=beep-data,target=/var/lib/postgresql/data \
 		-p 5432:5432 \
-		postgres:15'
+		postgres:17'
 }
 
 task:db.start = {

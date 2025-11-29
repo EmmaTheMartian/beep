@@ -23,7 +23,7 @@
 			required
 		>
 		<br>
-		<label for="password">password:</label>
+		<label for="password">password: <a href="#" id="view-password" style="display: inline;">view</a></label>
 		<input
 			type="password"
 			name="password"
@@ -33,6 +33,19 @@
 			maxlength="@app.config.user.password_max_len"
 			required
 		>
+		<br>
+		<label for="confirm-password">confirm password: <a href="#" id="view-confirm-password" style="display: inline;">view</a></label>
+		<input
+			type="password"
+			name="confirm-password"
+			id="confirm-password"
+			pattern="@app.config.user.password_pattern"
+			minlength="@app.config.user.password_min_len"
+			maxlength="@app.config.user.password_max_len"
+			required
+		>
+		<br>
+		<p>passwords match: <span id="passwords-match">yes</span></p>
 		<br>
 		@if app.config.instance.invite_only
 		<label for="invite-code">invite code:</label>
@@ -48,5 +61,37 @@
 	</form>
 	@end
 </div>
+
+<script>
+	const password = document.getElementById('password');
+	const confirm_password = document.getElementById('confirm-password');
+	const matches = document.getElementById('passwords-match');
+
+	const a = () => {
+		matches.innerText = password.value==confirm_password.value ? "yes" : "no";
+	};
+	password.addEventListener('input', a);
+	confirm_password.addEventListener('input', a);
+
+	const view_password = document.getElementById('view-password');
+	const view_confirm_password = document.getElementById('view-confirm-password');
+
+	const b = (elm, btn) => {
+		return event => {
+			if (elm.getAttribute('type') == 'password')
+			{
+				elm.setAttribute('type', 'text');
+				btn.innerText = 'hide';
+			}
+			else
+			{
+				elm.setAttribute('type', 'password')
+				btn.innerText = 'show';
+			}
+		};
+	};
+	view_password.addEventListener('click', b(password, view_password));
+	view_confirm_password.addEventListener('click', b(confirm_password, view_confirm_password));
+</script>
 
 @include 'partial/footer.html'
