@@ -13,6 +13,13 @@ instance = {
 
 	// set this to '' if your instance is closed source (twt)
 	source = 'https://github.com/emmathemartian/beep'
+
+	// toggle to `true` to require that users have an invite code to register
+	invite_only = false
+	invite_code = ''
+
+	// toggle to `true` to allow any non-logged-in user to view data (posts, users, etc)
+	public_data = false
 }
 
 http = {

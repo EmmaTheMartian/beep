@@ -1,0 +1,49 @@
+
+beep
+====
+
+> *a legendary land of lowercase lovers.*
+
+A self-hosted "social-media-oriented" mini-blogger.
+
+Technically made because I wanted to mess around with RSS,
+but I also wanted a teensy little blog/slow-paced-chat-app
+for myself and my friends.
+
+hosting
+-------
+
+You'll need a PostgreSQL database somewhere, along with V
+to compile beep:
+
+$ git clone https://github.com/emmathemartian/beep
+$ cd beep
+$ v -prod .
+
+Copy the `config.maple` as `config.real.maple`
+
+$ cp config.maple config.real.maple
+
+Edit `config.real.maple` to set the URL, port, DB username,
+password, and name.
+
+`config.real.maple` also has settings to configure the
+default theme, post length, username length, welcome
+messages, etc etc.
+
+WARNING: DO NOT PUT SECRETS IN `config.maple`.
+`config.maple` is intended to be pushed to Git as a
+"template config." Instead, use `config.real.maple` if you
+plan to push anywhere. It's gitignored by default, i.e, an
+accidental exclusion in the gitignore and push won't expose
+your keys.
+
+$ ./beep config.real.maple
+
+Then go to the configured port to view (default is
+`http://localhost:8008`).
+
+If you don't have a database, you can either self-host a
+psql database on your machine, or you can find a free one
+online. I like [neon.tech](https://neon.tech), their free
+plan is pretty comfortable for a small beep instance!

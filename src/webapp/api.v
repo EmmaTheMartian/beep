@@ -11,6 +11,26 @@ import json
 // people from requesting searches with huge limits and straining the SQL server
 pub const search_hard_limit = 50
 
+////// util ///////
+
+const always_public_routes = [
+	'/api/user/register/',
+]
+
+fn (mut app App) public_data_check(mut ctx Context) ?veb.Result {
+	if !app.config.instance.public_data {
+		println(ctx.req.url)
+		if ctx.req.url in always_public_routes {
+			return none
+		}
+		_ := app.whoami(mut ctx) or {
+			ctx.error('not logged in')
+			return ctx.redirect('/login')
+		}
+	}
+	return none
+}
+
 ////// user //////
 
 struct HcaptchaResponse {
@@ -40,6 +60,11 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 			ctx.error('failed to verify hcaptcha: ${data}')
 			return ctx.redirect('/register')
 		}
+	}
+
+	if app.config.instance.invite_only && ctx.form['invite-code'] != app.config.instance.invite_code {
+		ctx.error('invalid invite code')
+		return ctx.redirect('/register')
 	}
 
 	if app.get_user_by_name(username) != none {
@@ -254,15 +279,15 @@ fn (mut app App) api_user_set_nickname(mut ctx Context, nickname string) veb.Res
 	// validate
 	if clean_nickname != none && !app.validators.nickname.validate(clean_nickname or { '' }) {
 		ctx.error('invalid nickname')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
 	if !app.set_nickname(user.id, clean_nickname) {
 		eprintln('failed to update nickname for ${user} (${user.nickname} -> ${clean_nickname})')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
-	return ctx.redirect('/me')
+	return ctx.redirect('/settings')
 }
 
 @['/api/user/set_muted'; post]
@@ -301,14 +326,14 @@ fn (mut app App) api_user_set_automated(mut ctx Context, is_automated bool) veb.
 		ctx.error('failed to set automated status.')
 	}
 
-	return ctx.redirect('/me')
+	return ctx.redirect('/settings')
 }
 
 @['/api/user/set_theme'; post]
 fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
 	if !app.config.instance.allow_changing_theme {
 		ctx.error('this instance disallows changing themes :(')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
 	user := app.whoami(mut ctx) or {
@@ -323,10 +348,10 @@ fn (mut app App) api_user_set_theme(mut ctx Context, url string) veb.Result {
 
 	if !app.set_theme(user.id, theme) {
 		ctx.error('failed to change theme')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
-	return ctx.redirect('/me')
+	return ctx.redirect('/settings')
 }
 
 @['/api/user/set_pronouns'; post]
@@ -339,15 +364,15 @@ fn (mut app App) api_user_set_pronouns(mut ctx Context, pronouns string) veb.Res
 	clean_pronouns := pronouns.trim_space()
 	if !app.validators.pronouns.validate(clean_pronouns) {
 		ctx.error('invalid pronouns')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
 	if !app.set_pronouns(user.id, clean_pronouns) {
 		ctx.error('failed to change pronouns')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
-	return ctx.redirect('/me')
+	return ctx.redirect('/settings')
 }
 
 @['/api/user/set_bio'; post]
@@ -360,15 +385,15 @@ fn (mut app App) api_user_set_bio(mut ctx Context, bio string) veb.Result {
 	clean_bio := bio.trim_space()
 	if !app.validators.user_bio.validate(clean_bio) {
 		ctx.error('invalid bio')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
 	if !app.set_bio(user.id, clean_bio) {
 		eprintln('failed to update bio for ${user} (${user.bio} -> ${clean_bio})')
-		return ctx.redirect('/me')
+		return ctx.redirect('/settings')
 	}
 
-	return ctx.redirect('/me')
+	return ctx.redirect('/settings')
 }
 
 @['/api/user/get_name']
@@ -650,6 +675,9 @@ fn (mut app App) api_post_save_for_later(mut ctx Context, id int) veb.Result {
 
 @['/api/post/get_title']
 fn (mut app App) api_post_get_title(mut ctx Context, id int) veb.Result {
+	if !app.config.instance.public_data {
+		_ := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
+	}
 	post := app.get_post_by_id(id) or { return ctx.server_error('no such post') }
 	return ctx.text(post.title)
 }
@@ -701,12 +729,16 @@ fn (mut app App) api_post_pin(mut ctx Context, id int) veb.Result {
 
 @['/api/post/get/<id>'; get]
 fn (mut app App) api_post_get_post(mut ctx Context, id int) veb.Result {
+	if !app.config.instance.public_data {
+		_ := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
+	}
 	post := app.get_post_by_id(id) or { return ctx.text('no such post') }
 	return ctx.json[Post](post)
 }
 
 @['/api/post/search'; get]
 fn (mut app App) api_post_search(mut ctx Context, query string, limit int, offset int) veb.Result {
+	_ := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
 	if limit >= search_hard_limit {
 		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
 	}

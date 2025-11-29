@@ -4,6 +4,13 @@ import veb
 import entity { User }
 
 fn (mut app App) index(mut ctx Context) veb.Result {
+	if !app.config.instance.public_data {
+		_ := app.whoami(mut ctx) or {
+			ctx.error('not logged in')
+			return ctx.redirect('/login')
+		}
+	}
+
 	ctx.title = app.config.instance.name
 	user := app.whoami(mut ctx) or { User{} }
 	recent_posts := app.get_recent_posts()
@@ -91,6 +98,13 @@ fn (mut app App) logout(mut ctx Context) veb.Result {
 
 @['/user/:username']
 fn (mut app App) user(mut ctx Context, username string) veb.Result {
+	if !app.config.instance.public_data {
+		_ := app.whoami(mut ctx) or {
+			ctx.error('not logged in')
+			return ctx.redirect('/login')
+		}
+	}
+
 	user := app.whoami(mut ctx) or { User{} }
 	viewing := app.get_user_by_name(username) or {
 		ctx.error('user not found')
@@ -103,6 +117,13 @@ fn (mut app App) user(mut ctx Context, username string) veb.Result {
 
 @['/post/:post_id']
 fn (mut app App) post(mut ctx Context, post_id int) veb.Result {
+	if !app.config.instance.public_data {
+		_ := app.whoami(mut ctx) or {
+			ctx.error('not logged in')
+			return ctx.redirect('/login')
+		}
+	}
+
 	post := app.get_post_by_id(post_id) or {
 		ctx.error('no such post')
 		return ctx.redirect('/')
@@ -114,9 +135,7 @@ fn (mut app App) post(mut ctx Context, post_id int) veb.Result {
 	mut replying_to_user := app.get_unknown_user()
 
 	if post.replying_to != none {
-		replying_to_post = app.get_post_by_id(post.replying_to) or {
-			app.get_unknown_post()
-		}
+		replying_to_post = app.get_post_by_id(post.replying_to) or { app.get_unknown_post() }
 		replying_to_user = app.get_user_by_id(replying_to_post.author_id) or {
 			app.get_unknown_user()
 		}

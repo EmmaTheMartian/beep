@@ -1,27 +1,19 @@
-# binaries
-main
-clockwork
-beep
-*.exe
-*.exe~
-*.so
-*.dylib
-*.dll
-bin/
+# Binaries
+/beep
+/build/
 
-# editor/system specific metadata
+# Editor/system specific metadata
 .DS_Store
-.idea/
 .vscode/
-*.iml
 
-# secrets
+# Secrets
 /config.real.maple
 .env
 
-# local v and clockwork install (from gitpod stuffs)
+# Local V and Clockwork install (Gitpod)
+/clockwork
 /v/
 /clockwork/
 
-# quick notes i keep while developing
+# Quick notes I keep while developing
 /stickynote.md

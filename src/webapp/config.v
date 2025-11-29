@@ -15,6 +15,9 @@ pub mut:
 		allow_changing_theme bool
 		version              string
 		source               string
+		invite_only          bool
+		invite_code          string
+		public_data          bool
 	}
 	http        struct {
 	pub mut:
@@ -82,6 +85,9 @@ pub fn load_config_from(file_path string) Config {
 	config.instance.allow_changing_theme = loaded_instance.get('allow_changing_theme').to_bool()
 	config.instance.version = loaded_instance.get('version').to_str()
 	config.instance.source = loaded_instance.get('source').to_str()
+	config.instance.invite_only = loaded_instance.get('invite_only').to_bool()
+	config.instance.invite_code = loaded_instance.get('invite_code').to_str()
+	config.instance.public_data = loaded_instance.get('public_data').to_bool()
 
 	loaded_http := loaded.get('http')
 	config.http.port = loaded_http.get('port').to_int()
