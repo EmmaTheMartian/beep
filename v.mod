@@ -1,6 +1,6 @@
 Module {
 	name: 'beep'
-	description: 'A self-hosted mini-blogger'
+	description: 'a self-hosted mini-blogger'
 	version: '1.0.0'
 	license: 'MIT'
 	author: 'EmmaTheMartian'

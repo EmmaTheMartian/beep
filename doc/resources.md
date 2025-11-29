@@ -32,3 +32,13 @@ source: xkcd, <https://xkcd.com/327/>
 	- https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html#other-examples-of-safe-prepared-statements
 	- https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html#using-net-built-in-feature
 	- https://www.slideshare.net/slideshow/sql-injection-myths-and-fallacies/3729931#3
+
+## misc
+
+- https://stackoverflow.blog/2021/12/28/what-i-wish-i-had-known-about-single-page-applications/
+	- i thought about turning beep into a single page application (spa),
+	then done a bit of research. this blog post pointed out a variety of
+	problems that the author had with their spa, and many of those problems
+	would be problems for beep too.
+	- tl;dr: this blog post gave me the warnings about an spa before i
+	wasted my time implementing it on beep.

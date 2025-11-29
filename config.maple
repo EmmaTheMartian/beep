@@ -27,6 +27,12 @@ postgres = {
 	db = 'beep'
 }
 
+hcaptcha = {
+	enabled = false
+	secret = ''
+	site_key = ''
+}
+
 post = {
 	title_min_len = 1
 	title_max_len = 50

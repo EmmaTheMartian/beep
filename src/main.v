@@ -71,7 +71,7 @@ fn main() {
 		log: true
 	)
 
-	defer { app.db.close() }
+	defer { app.db.close() or { panic(err) } }
 
 	// add authenticator
 	app.auth = auth.new(app.db)

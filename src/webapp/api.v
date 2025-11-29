@@ -2,17 +2,46 @@ module webapp
 
 import veb
 import auth
-import entity { Like, LikeCache, Post, Site, User, Notification }
+import entity { Like, Post, User }
 import database { PostSearchResult }
+import net.http
+import json
 
 // search_hard_limit is the maximum limit for a search query, used to prevent
 // people from requesting searches with huge limits and straining the SQL server
-pub const search_hard_limit := 50
+pub const search_hard_limit = 50
 
 ////// user //////
 
+struct HcaptchaResponse {
+pub:
+	success     bool
+	error_codes []string @[json: 'error-codes']
+}
+
 @['/api/user/register'; post]
 fn (mut app App) api_user_register(mut ctx Context, username string, password string) veb.Result {
+	// before doing *anything*, check the captchas
+	if app.config.hcaptcha.enabled {
+		token := ctx.form['h-captcha-response']
+		response := http.post('https://api.hcaptcha.com/siteverify', '{
+			"secret": "${app.config.hcaptcha.site_key}",
+			"remoteip": "${ctx.ip()}",
+			"response": "${token}"
+		}') or {
+			ctx.error('failed to post hcaptcha response: ${err}')
+			return ctx.redirect('/register')
+		}
+		data := json.decode(HcaptchaResponse, response.body) or {
+			ctx.error('failed to decode hcaptcha response: ${err}')
+			return ctx.redirect('/register')
+		}
+		if !data.success {
+			ctx.error('failed to verify hcaptcha: ${data}')
+			return ctx.redirect('/register')
+		}
+	}
+
 	if app.get_user_by_name(username) != none {
 		ctx.error('username taken')
 		return ctx.redirect('/register')
@@ -42,11 +71,8 @@ fn (mut app App) api_user_register(mut ctx Context, username string, password st
 	}
 
 	if x := app.new_user(user) {
-		app.send_notification_to(
-			x.id,
-			app.config.welcome.summary.replace('%s', x.get_name()),
-			app.config.welcome.body.replace('%s', x.get_name())
-		)
+		app.send_notification_to(x.id, app.config.welcome.summary.replace('%s', x.get_name()),
+			app.config.welcome.body.replace('%s', x.get_name()))
 		token := app.auth.add_token(x.id, ctx.ip()) or {
 			eprintln(err)
 			ctx.error('api_user_register: could not create token for user with id ${x.id}')
@@ -399,9 +425,7 @@ fn (mut app App) api_user_search(mut ctx Context, query string, limit int, offse
 
 @['/api/user/whoami'; get]
 fn (mut app App) api_user_whoami(mut ctx Context) veb.Result {
-	user := app.whoami(mut ctx) or {
-		return ctx.text('not logged in')
-	}
+	user := app.whoami(mut ctx) or { return ctx.text('not logged in') }
 	return ctx.text(user.username)
 }
 
@@ -677,9 +701,7 @@ fn (mut app App) api_post_pin(mut ctx Context, id int) veb.Result {
 
 @['/api/post/get/<id>'; get]
 fn (mut app App) api_post_get_post(mut ctx Context, id int) veb.Result {
-	post := app.get_post_by_id(id) or {
-		return ctx.text('no such post')
-	}
+	post := app.get_post_by_id(id) or { return ctx.text('no such post') }
 	return ctx.json[Post](post)
 }
 

@@ -28,6 +28,12 @@ pub mut:
 		password string
 		db       string
 	}
+	hcaptcha    struct {
+	pub mut:
+		enabled  bool
+		secret   string
+		site_key string
+	}
 	post        struct {
 	pub mut:
 		title_min_len int
@@ -86,6 +92,11 @@ pub fn load_config_from(file_path string) Config {
 	config.postgres.user = loaded_postgres.get('user').to_str()
 	config.postgres.password = loaded_postgres.get('password').to_str()
 	config.postgres.db = loaded_postgres.get('db').to_str()
+
+	loaded_hcaptcha := loaded.get('hcaptcha')
+	config.hcaptcha.enabled = loaded_hcaptcha.get('enabled').to_bool()
+	config.hcaptcha.secret = loaded_hcaptcha.get('secret').to_str()
+	config.hcaptcha.site_key = loaded_hcaptcha.get('site_key').to_str()
 
 	loaded_post := loaded.get('post')
 	config.post.title_min_len = loaded_post.get('title_min_len').to_int()

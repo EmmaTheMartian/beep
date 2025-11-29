@@ -34,6 +34,11 @@
 			required
 		>
 		<br>
+		@if app.config.hcaptcha.enabled
+		<div class="h-captcha" data-sitekey="@{app.config.hcaptcha.site_key}"></div>
+		<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+		<br>
+		@end
 		<input type="submit" value="register">
 	</form>
 	@end
