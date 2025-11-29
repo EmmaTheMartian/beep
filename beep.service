@@ -1,0 +1,12 @@
+[Unit]
+Description=beep server
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/v run . config.real.maple
+Restart=always
+User=beep
+WorkingDirectory=/home/beep/beep
+
+[Install]
+WantedBy=multi-user.target
