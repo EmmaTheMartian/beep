@@ -426,6 +426,7 @@ fn (mut app App) api_user_delete(mut ctx Context, id int) veb.Result {
 
 @['/api/user/search'; get]
 fn (mut app App) api_user_search(mut ctx Context, query string, limit int, offset int) veb.Result {
+	_ := app.whoami(mut ctx) or { return ctx.unauthorized('not logged in') }
 	if limit >= search_hard_limit {
 		return ctx.text('limit exceeds hard limit (${search_hard_limit})')
 	}
