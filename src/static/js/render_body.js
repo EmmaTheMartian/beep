@@ -61,11 +61,15 @@ const render_body = async id => {
 	// give the body a loading """animation""" while we let the fetches cook
 	element.innerText = 'loading...'
 
-	const matches = body.matchAll(/[@#*]\([a-zA-Z0-9_.-]*\)/g)
+	const matches = body.matchAll(/\\?[@#*]\([a-zA-Z0-9_.-]*\)/g)
 	const cache = {}
 	for (const match of matches) {
+		// escaped
+		if (match[0][0] == '\\') {
+			html = html.replace(match[0], match[0].replace('\\', ''))
+		}
 		// mention
-		if (match[0][0] == '@') {
+		else if (match[0][0] == '@') {
 			if (cache.hasOwnProperty(match[0])) {
 				html = html.replace(match[0], cache[match[0]])
 				continue

@@ -21,6 +21,8 @@ postgresql documentation: https://www.postgresql.org/docs/
 - https://stackoverflow.com/questions/11144394/order-sql-by-strongest-like
 	- helped me develop the initial search system, which is subject to be
 	overhauled, but for now, this helped a lot.
+- https://stackoverflow.com/questions/1237725/copying-postgresql-database-to-another-server
+	- database migrations
 
 ## sql security
 

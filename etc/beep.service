@@ -1,12 +1,16 @@
 [Unit]
 Description=beep server
-After=network.target
+Requires=beep-db.service
+After=beep-db.service
 
 [Service]
 ExecStart=/usr/local/bin/v run . config.real.maple
 Restart=always
 User=beep
 WorkingDirectory=/home/beep/beep
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target

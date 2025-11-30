@@ -126,8 +126,14 @@ pub fn (app &App) process_post_mentions(post &Post) {
 		eprintln('failed to compile regex for process_post_mentions (err: ${err})')
 		return
 	}
-	matches := re.find_all_str(post.body)
-	for mat in matches {
+	matches := re.find_all(post.body)
+	for i := 0 ; i < matches.len ; i += 2 {
+		mat := post.body[matches[i]..matches[i+1]]
+		// skip escaped mentions
+		if matches[i] != 0 && post.body[matches[i] - 1] == `\\` {
+			continue
+		}
+
 		println('found mentioned user: ${mat}')
 		username := mat#[2..-1]
 		user := app.get_user_by_name(username) or {

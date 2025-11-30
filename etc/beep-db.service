@@ -1,0 +1,14 @@
+[Unit]
+Description=beep database
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker start beep-database
+ExecStop=/usr/bin/docker stop beep-database
+RemainAfterExit=yes
+WorkingDirectory=/home/beep/beep
+
+[Install]
+WantedBy=multi-user.target
